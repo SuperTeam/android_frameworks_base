@@ -550,6 +550,7 @@ public final class BluetoothAdapter {
     /** @hide */
     public boolean setScanMode(int mode) {
         if (getState() != STATE_ON) return false;
+        // TODO: Debería coger el tiempo de los settings. No puedo por que no tengo un ContentResolver.
         return setScanMode(mode, 120);
     }
 
