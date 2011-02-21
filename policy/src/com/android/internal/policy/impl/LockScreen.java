@@ -131,7 +131,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
 
     // time format from system settings - contains 12 or 24
     private int mTime12_24 = (Settings.System.getInt(mContext.getContentResolver(),
-            Settings.System.TIME_12_24, 12));
+            Settings.System.TIME_12_24, 24));
 
     private boolean mTrackballUnlockScreen = (Settings.System.getInt(mContext.getContentResolver(),
             Settings.System.TRACKBALL_UNLOCK_SCREEN, 0) == 1);
