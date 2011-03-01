@@ -454,11 +454,6 @@ public class StatusBarPolicy {
         settingsObserver.observe();
         updateSettings();
 
-        // settings observer for cm-battery change
-        SettingsObserver settingsObserver = new SettingsObserver(mHandler);
-        settingsObserver.observe();
-        updateSettings();
-
         // storage
         mStorageManager = (StorageManager) context.getSystemService(Context.STORAGE_SERVICE);
         mStorageManager.registerListener(
