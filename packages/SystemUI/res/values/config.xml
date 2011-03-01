@@ -21,6 +21,15 @@
      for different hardware and product builds. -->
 <resources>
     <!-- Control whether status bar should distinguish HSPA data icon form UMTS data icon on devices -->
+<<<<<<< HEAD
     <bool name="config_hspa_data_distinguishable">true</bool>
+=======
+    <bool name="config_hspa_data_distinguishable">false</bool>
+    <!-- Control whether status bar should have statusbar buttons (home,menu and back) available for tablet devices -->
+    <bool name="config_statusbar_buttons">false</bool>
+    <!-- Control whether the status bar buttons should have the home button hidden -->
+    <bool name="config_statusbar_hide_home">false</bool>
+
+>>>>>>> 6c1c1308744dc6b4e5cbf977556893be57e93327
 </resources>
 
