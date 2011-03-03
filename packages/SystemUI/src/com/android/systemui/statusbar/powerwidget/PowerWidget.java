@@ -49,7 +49,7 @@ public class PowerWidget extends FrameLayout {
     private static final String BUTTONS_DEFAULT = PowerButton.BUTTON_WIFI
                              + BUTTON_DELIMITER + PowerButton.BUTTON_BLUETOOTH
                              + BUTTON_DELIMITER + PowerButton.BUTTON_GPS
-                             + BUTTON_DELIMITER + PowerButton.BUTTON_SOUND
+                             + BUTTON_DELIMITER + PowerButton.BUTTON_NETWORKMODE
                              + BUTTON_DELIMITER + PowerButton.BUTTON_MOBILEDATA
                              + BUTTON_DELIMITER + PowerButton.BUTTON_AUTOROTATE;
 
