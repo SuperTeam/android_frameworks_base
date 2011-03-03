@@ -1161,7 +1161,7 @@ public final class Settings {
          * policy, which is to sleep shortly after the turning off
          * according to the {@link #STAY_ON_WHILE_PLUGGED_IN} setting.
          */
-        public static final int WIFI_SLEEP_POLICY_DEFAULT = 2;
+        public static final int WIFI_SLEEP_POLICY_DEFAULT = 0;
 
         /**
          * Value for {@link #WIFI_SLEEP_POLICY} to use the default policy when
