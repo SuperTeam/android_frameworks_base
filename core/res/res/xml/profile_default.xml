@@ -1,7 +1,7 @@
 <profiles>
 	<active>Default</active>
 	<profile name="Default">
-		<profileGroup name="Phone">
+		<profileGroup name="Telefono">
 			<sound>content://settings/system/notification_sound</sound>
 			<ringer>content://settings/system/ringtone</ringer>
 			<soundMode>DEFAULT</soundMode>
@@ -9,7 +9,7 @@
 			<vibrateMode>DEFAULT</vibrateMode>
 			<lightsMode>DEFAULT</lightsMode>
 		</profileGroup>
-		<profileGroup name="Calendar">
+		<profileGroup name="Calendario">
 			<sound>content://settings/system/notification_sound</sound>
 			<ringer>content://settings/system/ringtone</ringer>
 			<soundMode>DEFAULT</soundMode>
@@ -41,7 +41,7 @@
 			<vibrateMode>DEFAULT</vibrateMode>
 			<lightsMode>DEFAULT</lightsMode>
 		</profileGroup>
-		<profileGroup name="Other" default="true">
+		<profileGroup name="Otro" default="true">
 			<sound>content://settings/system/notification_sound</sound>
 			<ringer>content://settings/system/ringtone</ringer>
 			<soundMode>DEFAULT</soundMode>
@@ -50,58 +50,8 @@
 			<lightsMode>DEFAULT</lightsMode>
 		</profileGroup>
 	</profile>
-	<profile name="Work">
-		<profileGroup name="Phone">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>OVERRIDE</soundMode>
-			<ringerMode>OVERRIDE</ringerMode>
-			<vibrateMode>OVERRIDE</vibrateMode>
-			<lightsMode>OVERRIDE</lightsMode>
-		</profileGroup>
-		<profileGroup name="Calendar">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>SUPPRESS</soundMode>
-			<ringerMode>SUPPRESS</ringerMode>
-			<vibrateMode>OVERRIDE</vibrateMode>
-			<lightsMode>OVERRIDE</lightsMode>
-		</profileGroup>
-		<profileGroup name="Email">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>SUPPRESS</soundMode>
-			<ringerMode>SUPPRESS</ringerMode>
-			<vibrateMode>SUPPRESS</vibrateMode>
-			<lightsMode>SUPPRESS</lightsMode>
-		</profileGroup>
-		<profileGroup name="GMail">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>SUPPRESS</soundMode>
-			<ringerMode>SUPPRESS</ringerMode>
-			<vibrateMode>OVERRIDE</vibrateMode>
-			<lightsMode>DEFAULT</lightsMode>
-		</profileGroup>
-		<profileGroup name="SMS">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>OVERRIDE</soundMode>
-			<ringerMode>OVERRIDE</ringerMode>
-			<vibrateMode>OVERRIDE</vibrateMode>
-			<lightsMode>DEFAULT</lightsMode>
-		</profileGroup>
-		<profileGroup name="Other" default="true">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>DEFAULT</soundMode>
-			<ringerMode>DEFAULT</ringerMode>
-			<vibrateMode>DEFAULT</vibrateMode>
-			<lightsMode>DEFAULT</lightsMode>
-		</profileGroup>
-	</profile>
-	<profile name="Home">
-		<profileGroup name="Phone">
+	<profile name="Casa">
+		<profileGroup name="Telefono">
 			<sound>content://media/external/audio/media/11</sound>
 			<ringer>content://media/external/audio/media/5</ringer>
 			<soundMode>OVERRIDE</soundMode>
@@ -109,7 +59,7 @@
 			<vibrateMode>OVERRIDE</vibrateMode>
 			<lightsMode>DEFAULT</lightsMode>
 		</profileGroup>
-		<profileGroup name="Calendar">
+		<profileGroup name="Calendario">
 			<sound>content://settings/system/notification_sound</sound>
 			<ringer>content://settings/system/ringtone</ringer>
 			<soundMode>OVERRIDE</soundMode>
@@ -141,7 +91,7 @@
 			<vibrateMode>OVERRIDE</vibrateMode>
 			<lightsMode>DEFAULT</lightsMode>
 		</profileGroup>
-		<profileGroup name="Other" default="true">
+		<profileGroup name="Otro" default="true">
 			<sound>content://settings/system/notification_sound</sound>
 			<ringer>content://settings/system/ringtone</ringer>
 			<soundMode>DEFAULT</soundMode>
@@ -150,58 +100,8 @@
 			<lightsMode>DEFAULT</lightsMode>
 		</profileGroup>
 	</profile>
-	<profile name="Silent">
-		<profileGroup name="Phone">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>SUPPRESS</soundMode>
-			<ringerMode>SUPPRESS</ringerMode>
-			<vibrateMode>SUPPRESS</vibrateMode>
-			<lightsMode>DEFAULT</lightsMode>
-		</profileGroup>
-		<profileGroup name="Calendar">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>SUPPRESS</soundMode>
-			<ringerMode>SUPPRESS</ringerMode>
-			<vibrateMode>DEFAULT</vibrateMode>
-			<lightsMode>DEFAULT</lightsMode>
-		</profileGroup>
-		<profileGroup name="Email">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>SUPPRESS</soundMode>
-			<ringerMode>SUPPRESS</ringerMode>
-			<vibrateMode>DEFAULT</vibrateMode>
-			<lightsMode>DEFAULT</lightsMode>
-		</profileGroup>
-		<profileGroup name="GMail">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>SUPPRESS</soundMode>
-			<ringerMode>SUPPRESS</ringerMode>
-			<vibrateMode>DEFAULT</vibrateMode>
-			<lightsMode>DEFAULT</lightsMode>
-		</profileGroup>
-		<profileGroup name="SMS">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>SUPPRESS</soundMode>
-			<ringerMode>SUPPRESS</ringerMode>
-			<vibrateMode>DEFAULT</vibrateMode>
-			<lightsMode>DEFAULT</lightsMode>
-		</profileGroup>
-		<profileGroup name="Other" default="true">
-			<sound>content://settings/system/notification_sound</sound>
-			<ringer>content://settings/system/ringtone</ringer>
-			<soundMode>SUPPRESS</soundMode>
-			<ringerMode>SUPPRESS</ringerMode>
-			<vibrateMode>DEFAULT</vibrateMode>
-			<lightsMode>DEFAULT</lightsMode>
-		</profileGroup>
-	</profile>
-	<profile name="Night">
-		<profileGroup name="Phone">
+	<profile name="Noche">
+		<profileGroup name="Telefono">
 			<sound>content://settings/system/notification_sound</sound>
 			<ringer>content://settings/system/ringtone</ringer>
 			<soundMode>OVERRIDE</soundMode>
@@ -209,7 +109,7 @@
 			<vibrateMode>OVERRIDE</vibrateMode>
 			<lightsMode>DEFAULT</lightsMode>
 		</profileGroup>
-		<profileGroup name="Calendar">
+		<profileGroup name="Calendario">
 			<sound>content://settings/system/notification_sound</sound>
 			<ringer>content://settings/system/ringtone</ringer>
 			<soundMode>SUPPRESS</soundMode>
@@ -241,7 +141,7 @@
 			<vibrateMode>OVERRIDE</vibrateMode>
 			<lightsMode>SUPPRESS</lightsMode>
 		</profileGroup>
-		<profileGroup name="Other" default="true">
+		<profileGroup name="Otro" default="true">
 			<sound>content://settings/system/notification_sound</sound>
 			<ringer>content://settings/system/ringtone</ringer>
 			<soundMode>SUPPRESS</soundMode>
@@ -250,10 +150,60 @@
 			<lightsMode>DEFAULT</lightsMode>
 		</profileGroup>
 	</profile>
-	<notificationGroup name="Phone">
+	<profile name="Silencio">
+		<profileGroup name="Telefono">
+			<sound>content://settings/system/notification_sound</sound>
+			<ringer>content://settings/system/ringtone</ringer>
+			<soundMode>OVERRIDE</soundMode>
+			<ringerMode>OVERRIDE</ringerMode>
+			<vibrateMode>OVERRIDE</vibrateMode>
+			<lightsMode>DEFAULT</lightsMode>
+		</profileGroup>
+		<profileGroup name="Calendario">
+			<sound>content://settings/system/notification_sound</sound>
+			<ringer>content://settings/system/ringtone</ringer>
+			<soundMode>SUPPRESS</soundMode>
+			<ringerMode>SUPPRESS</ringerMode>
+			<vibrateMode>OVERRIDE</vibrateMode>
+			<lightsMode>SUPPRESS</lightsMode>
+		</profileGroup>
+		<profileGroup name="GMail">
+			<sound>content://settings/system/notification_sound</sound>
+			<ringer>content://settings/system/ringtone</ringer>
+			<soundMode>SUPPRESS</soundMode>
+			<ringerMode>SUPPRESS</ringerMode>
+			<vibrateMode>SUPPRESS</vibrateMode>
+			<lightsMode>DEFAULT</lightsMode>
+		</profileGroup>
+		<profileGroup name="Email">
+			<sound>content://settings/system/notification_sound</sound>
+			<ringer>content://settings/system/ringtone</ringer>
+			<soundMode>SUPPRESS</soundMode>
+			<ringerMode>SUPPRESS</ringerMode>
+			<vibrateMode>SUPPRESS</vibrateMode>
+			<lightsMode>DEFAULT</lightsMode>
+		</profileGroup>
+		<profileGroup name="SMS">
+			<sound>content://settings/system/notification_sound</sound>
+			<ringer>content://settings/system/ringtone</ringer>
+			<soundMode>SUPPRESS</soundMode>
+			<ringerMode>SUPPRESS</ringerMode>
+			<vibrateMode>OVERRIDE</vibrateMode>
+			<lightsMode>SUPPRESS</lightsMode>
+		</profileGroup>
+		<profileGroup name="Otro" default="true">
+			<sound>content://settings/system/notification_sound</sound>
+			<ringer>content://settings/system/ringtone</ringer>
+			<soundMode>SUPPRESS</soundMode>
+			<ringerMode>DEFAULT</ringerMode>
+			<vibrateMode>DEFAULT</vibrateMode>
+			<lightsMode>DEFAULT</lightsMode>
+		</profileGroup>
+	</profile>
+	<notificationGroup name="Telefono">
 		<package>com.android.phone</package>
 	</notificationGroup>
-	<notificationGroup name="Calendar">
+	<notificationGroup name="Calendario">
 		<package>com.android.calendar</package>
 	</notificationGroup>
 	<notificationGroup name="GMail">
