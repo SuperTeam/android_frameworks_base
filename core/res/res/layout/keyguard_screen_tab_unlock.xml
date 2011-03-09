@@ -174,14 +174,14 @@
             android:visibility="gone"
             />
 
-     <!--   <com.android.internal.widget.SlidingTab
+        <com.android.internal.widget.SlidingTab
             android:id="@+id/tab_selector2"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="150dip"
-            />-->
+            />
 
         <com.android.internal.widget.SlidingTab
             android:id="@+id/tab_selector"
@@ -192,13 +192,13 @@
             android:layout_marginBottom="60dip"
             />
 
-        <!--<com.android.internal.widget.RotarySelector
+        <com.android.internal.widget.RotarySelector
             android:id="@+id/rotary_selector"
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            />-->
+            />
 
         <!-- emergency call button shown when sim is PUKd and tab_selector is
              hidden -->
