@@ -904,4 +904,21 @@
     <string name="media_shared" product="nosdcard" msgid="5830814349250834225">"Un equipo está utilizando actualmente el almacenamiento USB."</string>
     <string name="media_shared" product="default" msgid="5706130568133540435">"Un equipo está utilizando actualmente la tarjeta SD."</string>
     <string name="media_unknown_state" msgid="729192782197290385">"Estado de medio externo desconocido"</string>
+
+    <!-- Names of default profiles. -->
+    <string name="profileNameDefault">Normal</string>
+    <string name="profileNameWork">Trabajo</string>
+    <string name="profileNameHome">Casa</string>
+    <string name="profileNameSilent">Silencio</string>
+    <string name="profileNameNight">Noche</string>
+
+    <!-- Names of application groups. -->
+    <string name="profileGroupPhone">Teléfono</string>
+    <string name="profileGroupCalendar">Calendario</string>
+    <string name="profileGroupGmail">Gmail</string>
+    <string name="profileGroupEmail">Email</string>
+    <string name="profileGroupSMS">SMS</string>
+
+    <!-- Name of wildcard profile. -->
+    <string name="wildcardProfile">Otro</string>
 </resources>
