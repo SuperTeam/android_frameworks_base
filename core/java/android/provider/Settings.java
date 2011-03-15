@@ -4339,7 +4339,7 @@ public final class Settings {
          * Virtual network roaming
          * @hide
          */
-     /*   public static final String MVNO_ROAMING = "button_mvno_roaming_key"; Super */
+        public static final String MVNO_ROAMING = "button_mvno_roaming_key";
 
         /**
          * @hide
