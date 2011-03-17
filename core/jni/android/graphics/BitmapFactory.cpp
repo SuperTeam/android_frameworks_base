@@ -402,7 +402,7 @@ static jobject nativeDecodeAsset(JNIEnv* env, jobject clazz,
     SkStream* stream;
     Asset* asset = reinterpret_cast<Asset*>(native_asset);
     bool forcePurgeable = mPurgeableAssets;
-    if (forcePurgeable) {
+    if (forcePurgeable || optionsPurgeable(env, options)) {
         // if we could "ref/reopen" the asset, we may not need to copy it here
         // and we could assume optionsShareable, since assets are always RO
         stream = copyAssetToStream(asset);
@@ -570,7 +570,7 @@ int register_android_graphics_BitmapFactory(JNIEnv* env) {
     gFileDescriptor_descriptor = getFieldIDCheck(env, gFileDescriptor_class, "descriptor", "I");
 
     char value[PROPERTY_VALUE_MAX];
-    property_get("persist.sys.purgeable_assets", value, "1");
+    property_get("persist.sys.purgeable_assets", value, "0");
     mPurgeableAssets = atoi(value) == 1;
 
     int ret = AndroidRuntime::registerNativeMethods(env,
