@@ -103,10 +103,10 @@ public abstract class PowerButton {
                     updateImageView(buttonIcon, mIcon);
 
                     int sColorMaskBase = Settings.System.getInt(context.getContentResolver(),
-                            Settings.System.EXPANDED_VIEW_WIDGET_COLOR, 0xFF5F5F5F);
-                    int sColorMaskOn    = (sColorMaskBase & 0x00FFFFFF) | 0xA0000000;
+                            Settings.System.EXPANDED_VIEW_WIDGET_COLOR, 0xFFFFFFFF);
+                    int sColorMaskOn    = (sColorMaskBase & 0x00FFFFFF) | 0xF0000000;
                     int sColorMaskOff   = (sColorMaskBase & 0x00FFFFFF) | 0x33000000;
-                    int sColorMaskInter = (sColorMaskBase & 0x00FFFFFF) | 0x60000000;
+                    int sColorMaskInter = (sColorMaskBase & 0x00FFFFFF) | 0x88000000;
 
                     /* Button State */
                     switch(mState) {
