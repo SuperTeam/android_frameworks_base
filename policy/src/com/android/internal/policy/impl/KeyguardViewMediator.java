@@ -134,7 +134,7 @@ public class KeyguardViewMediator implements KeyguardViewCallback,
      * turning on the keyguard (i.e, the user has this much time to turn
      * the screen back on without having to face the keyguard).
      */
-    private static final int KEYGUARD_DELAY_MS = 5000;
+    private static final int KEYGUARD_DELAY_MS = 0;
 
     /**
      * How long we'll wait for the {@link KeyguardViewCallback#keyguardDoneDrawing()}
