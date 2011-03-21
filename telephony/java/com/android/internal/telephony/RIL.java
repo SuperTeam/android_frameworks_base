@@ -629,9 +629,11 @@ public final class RIL extends BaseCommands implements CommandsInterface {
                 mPhoneType = RILConstants.CDMA_PHONE;
                 break;
             case RILConstants.NETWORK_MODE_GLOBAL:
+               // mPhoneType = RILConstants.CDMA_PHONE;
                 mPhoneType = RILConstants.GSM_PHONE;
                 break;
             default:
+               // mPhoneType = RILConstants.CDMA_PHONE;
                 mPhoneType = RILConstants.GSM_PHONE;
         }
 
