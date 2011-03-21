@@ -495,12 +495,12 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                 if (ar.exception == null) {
                     mPreferredNetworkType = ((int[])ar.result)[0];
                 } else {
-                    //mPreferredNetworkType = RILConstants.NETWORK_MODE_GLOBAL;
+                  //  mPreferredNetworkType = RILConstants.NETWORK_MODE_GLOBAL;
                     mPreferredNetworkType = RILConstants.NETWORK_MODE_GSM_UMTS;
                 }
 
                 message = obtainMessage(EVENT_SET_PREFERRED_NETWORK_TYPE, ar.userObj);
-                //int toggledNetworkType = RILConstants.NETWORK_MODE_GLOBAL;
+               // int toggledNetworkType = RILConstants.NETWORK_MODE_GLOBAL;
                 int toggledNetworkType = RILConstants.NETWORK_MODE_GSM_UMTS;
 
                 cm.setPreferredNetworkType(toggledNetworkType, message);
@@ -1303,7 +1303,7 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
 
         boolean mvnoRoaming = Settings.System.getInt(
                 phone.getContext().getContentResolver(),
-                Settings.Secure.MVNO_ROAMING, 0) == 1;
+                Settings.Secure.MVNO_ROAMING, 1) == 1;
 
         String spn;
 
