@@ -883,7 +883,7 @@ public class ConnectivityService extends IConnectivityManager.Stub {
      */
     public boolean getBackgroundDataSetting() {
         return Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.BACKGROUND_DATA, 0) == 1;
+                Settings.Secure.BACKGROUND_DATA, 1) == 1;
     }
 
     /**
