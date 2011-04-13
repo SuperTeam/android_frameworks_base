@@ -25,7 +25,7 @@
     >
 
     <LinearLayout
-        android:id="@+id/power_and_carrier"
+	android:id="@+id/exp_view_lin_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
