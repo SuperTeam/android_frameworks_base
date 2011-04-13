@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <!--
 /* apps/common/assets/default/default/skins/StatusBar.xml
 **
@@ -25,7 +24,8 @@
     android:descendantFocusability="afterDescendants"
     >
 
-    <LinearLayout android:id="@+id/exp_view_lin_layout"
+    <LinearLayout
+        android:id="@+id/power_and_carrier"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
