@@ -2146,6 +2146,13 @@ public final class Settings {
         public static final String STATUS_BAR_CLOCK = "status_bar_clock";
 
         /**
+         * Whether to move to compact carrier label in notification dropdown
+         *
+         * @hide
+         */
+        public static final String STATUS_BAR_COMPACT_CARRIER = "status_bar_compact_carrier";
+
+        /**
          * Whether to display the status bar on top or bottom
          * 0: show status bar on top (default for most devices)
          * 1: show status bar on bottom
@@ -2521,6 +2528,15 @@ public final class Settings {
          * @hide
          */
         public static final String EXPANDED_HIDE_ONCHANGE = "expanded_hide_onchange";
+
+        /**
+         * Whether to hide the scrollbar when scrollable
+         * (more than six widgets)
+         *
+         * @hide
+         */
+        public static final String EXPANDED_HIDE_SCROLLBAR = "expanded_hide_scrollbar";
+
 
         /**
          * Notification Indicator Color
