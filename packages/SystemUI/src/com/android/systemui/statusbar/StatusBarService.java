@@ -330,10 +330,11 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
 
         mIconSize = res.getDimensionPixelSize(com.android.internal.R.dimen.status_bar_icon_size);
 
+        //Check for compact carrier layout and apply if enabled
         compactCarrier = Settings.System.getInt(getContentResolver(),
                                                        Settings.System.STATUS_BAR_COMPACT_CARRIER, 1) == 1;
         ExpandedView expanded = compactCarrier ? (ExpandedView)View.inflate(context,
-                                                R.layout.status_bar_expanded_compact_carrier, null) : 
+                                                R.layout.status_bar_expanded_compact_carrier, null) :
                                                 (ExpandedView)View.inflate(context,
                                                 R.layout.status_bar_expanded, null);
         expanded.mService = this;
@@ -384,6 +385,12 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
                         }
                     }
                 });
+        mPowerWidget.setGlobalButtonOnLongClickListener(new View.OnLongClickListener() {
+                   public boolean onLongClick(View v) {
+                       animateCollapse();
+                       return true;
+                   }
+               });
 
         mTicker = new MyTicker(context, sb);
 
@@ -431,7 +438,7 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
 
         // readd in right order
         mExpandedView.addView(powerAndCarrier, mBottomBar ? 1 : 0);
-        powerAndCarrier.addView(power, mBottomBar ? 1 : 0);
+        powerAndCarrier.addView(power, mBottomBar && !compactCarrier ? 1 : 0);
     }*/
 
     protected void addStatusBarView() {
