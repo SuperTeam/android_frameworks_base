@@ -1313,7 +1313,8 @@ public final class RIL extends BaseCommands implements CommandsInterface {
                 : RILConstants.SETUP_DATA_AUTH_NONE;
 
         setupDataCall(Integer.toString(radioTechnology), profile, apn, user,
-                password, Integer.toString(authType), result);
+                password, Integer.toString(authType),
+                RILConstants.SETUP_DATA_PROTOCOL_IP, result);
 
     }
 
@@ -1325,18 +1326,14 @@ public final class RIL extends BaseCommands implements CommandsInterface {
         deactivateDataCall(cid, result);
     }
 
-    /**
-     * The preferred new alternative to setupDefaultPDP that is
-     * CDMA-compatible.
-     *
-     */
     public void
     setupDataCall(String radioTechnology, String profile, String apn,
-            String user, String password, String authType, Message result) {
+            String user, String password, String authType, String protocol,
+            Message result) {
         RILRequest rr
                 = RILRequest.obtain(RIL_REQUEST_SETUP_DATA_CALL, result);
 
-        rr.mp.writeInt(6);
+        rr.mp.writeInt(7);
 
         rr.mp.writeString(radioTechnology);
         rr.mp.writeString(profile);
@@ -1344,11 +1341,12 @@ public final class RIL extends BaseCommands implements CommandsInterface {
         rr.mp.writeString(user);
         rr.mp.writeString(password);
         rr.mp.writeString(authType);
+        rr.mp.writeString(protocol);
 
         if (RILJ_LOGD) riljLog(rr.serialString() + "> "
                 + requestToString(rr.mRequest) + " " + radioTechnology + " "
                 + profile + " " + apn + " " + user + " "
-                + password + " " + authType);
+                + password + " " + authType + " " + protocol);
 
         send(rr);
     }
@@ -2972,7 +2970,11 @@ public final class RIL extends BaseCommands implements CommandsInterface {
             dataCall.active = p.readInt();
             dataCall.type = p.readString();
             dataCall.apn = p.readString();
-            dataCall.address = p.readString();
+            String address = p.readString();
+            if (address != null) {
+                address = address.split(" ")[0];
+            }
+            dataCall.address = address;
 
             response.add(dataCall);
         }
