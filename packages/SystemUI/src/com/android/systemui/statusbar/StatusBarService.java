@@ -128,7 +128,6 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
     // top bar
     TextView mNoNotificationsTitle;
     TextView mClearButton;
-    TextView mCompactClearButton;
     ViewGroup mClearButtonParent;
     CmBatteryMiniIcon mCmBatteryMiniIcon;
     // drag bar
@@ -157,11 +156,6 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
 
     // the power widget
     PowerWidget mPowerWidget;
-
-    //Carrier label stuff
-    LinearLayout mCarrierLabelLayout;
-    LinearLayout mCompactCarrierLayout;
-    LinearLayout mPowerAndCarrier;
 
     // ticker
     private Ticker mTicker;
@@ -211,10 +205,6 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
                     Settings.System.getUriFor(Settings.System.SOFT_BUTTONS_LEFT), false, this);
             resolver.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.STATUS_BAR_DEAD_ZONE), false, this);
-            resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.STATUS_BAR_COMPACT_CARRIER), false, this);
-            resolver.registerContentObserver(
-                    Settings.System.getUriFor(Settings.System.EXPANDED_VIEW_WIDGET), false, this);
             onChange(true);
         }
 
@@ -330,7 +320,7 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         return null;
     }
 
-    private boolean mCompactCarrier = false;
+    private boolean compactCarrier = false;
 
     // ================================================================================
     // Constructing the view
@@ -341,9 +331,9 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         mIconSize = res.getDimensionPixelSize(com.android.internal.R.dimen.status_bar_icon_size);
 
         //Check for compact carrier layout and apply if enabled
-        mcompactCarrier = Settings.System.getInt(getContentResolver(),
+        compactCarrier = Settings.System.getInt(getContentResolver(),
                                                        Settings.System.STATUS_BAR_COMPACT_CARRIER, 1) == 1;
-        mExpandedView expanded = compactCarrier ? (ExpandedView)View.inflate(context,
+        ExpandedView expanded = compactCarrier ? (ExpandedView)View.inflate(context,
                                                 R.layout.status_bar_expanded_compact_carrier, null) :
                                                 (ExpandedView)View.inflate(context,
                                                 R.layout.status_bar_expanded, null);
@@ -377,9 +367,7 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         mNoNotificationsTitle = (TextView)expanded.findViewById(R.id.noNotificationsTitle);
         mClearButton = (TextView)expanded.findViewById(R.id.clear_all_button);
         mClearButton.setOnClickListener(mClearButtonListener);
-        mCompactClearButton = (TextView)expanded.findViewById(R.id.compact_clear_all_button);
-        mCompactClearButton.setOnClickListener(mClearButtonListener);
-        mPowerAndCarrier = (LinearLayout)expanded.findViewById(R.id.power_and_carrier);
+        mClearButtonParent = (ViewGroup)mClearButton.getParent();
         mScrollView = (ScrollView)expanded.findViewById(R.id.scroll);
         mNotificationLinearLayout = expanded.findViewById(R.id.notificationLinearLayout);
 
@@ -403,9 +391,6 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
                        return true;
                    }
                });
-
-        mCarrierLabelLayout = (LinearLayout)expanded.findViewById(R.id.carrier_label_layout);
-        mCompactCarrierLayout = (LinearLayout)expanded.findViewById(R.id.compact_carrier_layout);
 
         mTicker = new MyTicker(context, sb);
 
@@ -741,17 +726,25 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         return entry.notification;
     }
 
+    private boolean isClearButtonAdded = false;
+
     private void setAreThereNotifications() {
         boolean ongoing = mOngoing.hasVisibleItems();
         boolean latest = mLatest.hasVisibleItems();
 
         // (no ongoing notifications are clearable)
         if (mLatest.hasClearableItems()) {
-            if (mCompactCarrier) mCompactClearButton.setVisibility(View.VISIBLE);
             mClearButton.setVisibility(View.VISIBLE);
+            if (compactCarrier && !isClearButtonAdded) {
+                mClearButtonParent.addView(mClearButton);
+                isClearButtonAdded = true;
+            }
         } else {
-            mCompactClearButton.setVisibility(View.GONE);
             mClearButton.setVisibility(View.INVISIBLE);
+            if (compactCarrier) {
+                mClearButtonParent.removeView(mClearButton);
+                isClearButtonAdded = false;
+            }
         }
 
         mOngoingTitle.setVisibility(ongoing ? View.VISIBLE : View.GONE);
