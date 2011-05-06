@@ -128,6 +128,7 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
     // top bar
     TextView mNoNotificationsTitle;
     TextView mClearButton;
+    TextView mCompactClearButton;
     ViewGroup mClearButtonParent;
     CmBatteryMiniIcon mCmBatteryMiniIcon;
     // drag bar
@@ -156,6 +157,11 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
 
     // the power widget
     PowerWidget mPowerWidget;
+
+    //Carrier label stuff
+    LinearLayout mCarrierLabelLayout;
+    LinearLayout mCompactCarrierLayout;
+    LinearLayout mPowerAndCarrier;
 
     // ticker
     private Ticker mTicker;
@@ -205,6 +211,10 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
                     Settings.System.getUriFor(Settings.System.SOFT_BUTTONS_LEFT), false, this);
             resolver.registerContentObserver(
                     Settings.System.getUriFor(Settings.System.STATUS_BAR_DEAD_ZONE), false, this);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.STATUS_BAR_COMPACT_CARRIER), false, this);
+            resolver.registerContentObserver(
+                    Settings.System.getUriFor(Settings.System.EXPANDED_VIEW_WIDGET), false, this);
             onChange(true);
         }
 
@@ -223,6 +233,12 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
             mDeadZone = (Settings.System.getInt(resolver,
                     Settings.System.STATUS_BAR_DEAD_ZONE, defValue) == 1);
            // updateLayout();
+// Supe@
+            mCompactCarrier = (Settings.System.getInt(resolver,
+                    Settings.System.STATUS_BAR_COMPACT_CARRIER, 0) == 1);
+            updateLayout();
+            updateCarrierLabel();
+// Super@
         }
     }
 
@@ -320,7 +336,7 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         return null;
     }
 
-    private boolean compactCarrier = false;
+    private boolean mCompactCarrier = false;
 
     // ================================================================================
     // Constructing the view
@@ -367,7 +383,9 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         mNoNotificationsTitle = (TextView)expanded.findViewById(R.id.noNotificationsTitle);
         mClearButton = (TextView)expanded.findViewById(R.id.clear_all_button);
         mClearButton.setOnClickListener(mClearButtonListener);
-        mClearButtonParent = (ViewGroup)mClearButton.getParent();
+        mCompactClearButton = (TextView)expanded.findViewById(R.id.compact_clear_all_button);
+        mCompactClearButton.setOnClickListener(mClearButtonListener);
+        mPowerAndCarrier = (LinearLayout)expanded.findViewById(R.id.power_and_carrier);
         mScrollView = (ScrollView)expanded.findViewById(R.id.scroll);
         mNotificationLinearLayout = expanded.findViewById(R.id.notificationLinearLayout);
 
@@ -392,6 +410,9 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
                    }
                });
 
+        mCarrierLabelLayout = (LinearLayout)expanded.findViewById(R.id.carrier_label_layout);
+        mCompactCarrierLayout = (LinearLayout)expanded.findViewById(R.id.compact_carrier_layout);
+
         mTicker = new MyTicker(context, sb);
 
         TickerView tickerView = (TickerView)sb.findViewById(R.id.tickerText);
@@ -404,6 +425,8 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
 
       //  updateLayout();
         mContext=context;
+        updateLayout();
+        updateCarrierLabel();
 
         mEdgeBorder = res.getDimensionPixelSize(R.dimen.status_bar_edge_ignore);
 
@@ -420,6 +443,21 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
     }
 
   /*  private void updateLayout() {
+    private void updateCarrierLabel() {
+        if (mCompactCarrier) {
+            mCarrierLabelLayout.setVisibility(View.GONE);
+            mCompactCarrierLayout.setVisibility(View.VISIBLE);
+            if (mLatest.hasClearableItems())
+                mCompactClearButton.setVisibility(View.VISIBLE);
+        } else {
+            mCarrierLabelLayout.setVisibility(View.VISIBLE);
+            mCompactCarrierLayout.setVisibility(View.GONE);
+            mCompactClearButton.setVisibility(View.GONE);
+        }
+
+    }
+
+    private void updateLayout() {
         if(mTrackingView==null || mCloseView==null || mExpandedView==null)
             return;
 
@@ -726,25 +764,17 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         return entry.notification;
     }
 
-    private boolean isClearButtonAdded = false;
-
     private void setAreThereNotifications() {
         boolean ongoing = mOngoing.hasVisibleItems();
         boolean latest = mLatest.hasVisibleItems();
 
         // (no ongoing notifications are clearable)
         if (mLatest.hasClearableItems()) {
+            if (mCompactCarrier) mCompactClearButton.setVisibility(View.VISIBLE);
             mClearButton.setVisibility(View.VISIBLE);
-            if (compactCarrier && !isClearButtonAdded) {
-                mClearButtonParent.addView(mClearButton);
-                isClearButtonAdded = true;
-            }
         } else {
+            mCompactClearButton.setVisibility(View.GONE);
             mClearButton.setVisibility(View.INVISIBLE);
-            if (compactCarrier) {
-                mClearButtonParent.removeView(mClearButton);
-                isClearButtonAdded = false;
-            }
         }
 
         mOngoingTitle.setVisibility(ongoing ? View.VISIBLE : View.GONE);
