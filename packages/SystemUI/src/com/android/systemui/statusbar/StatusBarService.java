@@ -233,12 +233,12 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
             mDeadZone = (Settings.System.getInt(resolver,
                     Settings.System.STATUS_BAR_DEAD_ZONE, defValue) == 1);
            // updateLayout();
-// Supe@
+/*
             mCompactCarrier = (Settings.System.getInt(resolver,
                     Settings.System.STATUS_BAR_COMPACT_CARRIER, 0) == 1);
             updateLayout();
             updateCarrierLabel();
-// Super@
+// Super@*/
         }
     }
 
@@ -425,8 +425,8 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
 
       //  updateLayout();
         mContext=context;
-        updateLayout();
-        updateCarrierLabel();
+       /* updateLayout();
+        updateCarrierLabel();*/
 
         mEdgeBorder = res.getDimensionPixelSize(R.dimen.status_bar_edge_ignore);
 
