@@ -2318,6 +2318,13 @@ public final class Settings {
          //
         public static final String STATUS_BAR_COMPACT_CARRIER = "status_bar_compact_carrier";*/
 
+         /**
+         * Whether to control brightness from status bar
+         *
+         * @hide
+         */
+        public static final String STATUS_BAR_BRIGHTNESS_TOGGLE = "status_bar_brightness_toggle";
+
         /**
          * Whether to wake the screen with the trackball. The value is boolean (1 or 0).
          * @hide
@@ -2558,6 +2565,13 @@ public final class Settings {
          * @hide
          */
         public static final String EXPANDED_HIDE_SCROLLBAR = "expanded_hide_scrollbar";
+
+        /**
+         * Hide indicator in status bar widget
+         *
+         * @hide
+         */
+        public static final String EXPANDED_HIDE_INDICATOR = "expanded_hide_indicator";
 
         /**
          * Notification Indicator Color
