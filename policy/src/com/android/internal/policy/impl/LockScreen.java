@@ -114,7 +114,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
 
     // are we showing battery information?
     private boolean mShowingBatteryInfo = false;
-
+    
     // last known plugged in state
     private boolean mPluggedIn = false;
 
@@ -130,6 +130,10 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
     private AudioManager mAudioManager;
     private String mDateFormatString;
     private boolean mEnableMenuKeyInLockScreen;
+
+    // are we showing carrier name
+    private int mShowingCarrier = (Settings.System.getInt(mContext.getContentResolver(),
+            Settings.System.LOCKSCREEN_CARRIER, 0));
 
     // time format from system settings - contains 12 or 24
     private int mTime12_24 = (Settings.System.getInt(mContext.getContentResolver(),
@@ -917,10 +921,10 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
         switch (status) {
             case Normal:
                 // text
-                mCarrier.setText(
+                mCarrier.setText((mShowingCarrier == 1) ? 
                         getCarrierString(
                                 mUpdateMonitor.getTelephonyPlmn(),
-                                mUpdateMonitor.getTelephonySpn()));
+                                mUpdateMonitor.getTelephonySpn()): "");
 
                 // Empty now, but used for sliding tab feedback
                 mScreenLocked.setText("");
