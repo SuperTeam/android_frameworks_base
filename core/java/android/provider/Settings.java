@@ -2564,6 +2564,12 @@ public final class Settings {
         public static final String LOCKSCREEN_ALWAYS_BATTERY = "lockscreen_always_battery";
 
         /**
+         * Whether to show the carrier name
+         * @hide
+         */
+        public static final String LOCKSCREEN_CARRIER = "lockscreen_carrier";
+
+        /**
          * Whether to use lockscreen music controls
          * @hide
          */
