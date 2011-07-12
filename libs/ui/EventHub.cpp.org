@@ -154,17 +154,7 @@ status_t EventHub::getAbsoluteAxisInfo(int32_t deviceId, int axis,
     if (device == NULL) return -1;
 
     struct input_absinfo info;
-#ifdef GTP1000_TS
-    if (ABS_X == axis)
-    {
-        axis = ABS_Y;
-    }
-    else
-    if (ABS_Y == axis);
-    {
-        axis = ABS_X;
-    }
-#endif
+
     if(ioctl(device->fd, EVIOCGABS(axis), &info)) {
         LOGW("Error reading absolute controller %d for device %s fd %d\n",
              axis, device->name.string(), device->fd);
