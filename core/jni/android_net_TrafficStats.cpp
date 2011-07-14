@@ -32,6 +32,10 @@
  #define MOBILE_IFACE_NAME "rmnet0"
 #endif
 
+#ifndef SYS_CLASS_DIR
+ #define SYS_CLASS_DIR "/sys/class/net"
+#endif
+
 namespace android {
 
 // Returns an ASCII decimal number read from the specified file, -1 on error.
@@ -69,7 +73,7 @@ static jlong tryBoth(char const* a, char const* b) {
 // -1 if no such file exists.
 static jlong readTotal(char const* suffix) {
 #ifdef HAVE_ANDROID_OS
-    char filename[PATH_MAX] = "/sys/class/net/";
+    char filename[PATH_MAX] = SYS_CLASS_DIR "/";
     DIR *dir = opendir(filename);
     if (dir == NULL) {
         LOGE("Can't list %s: %s", filename, strerror(errno));
@@ -100,35 +104,27 @@ static jlong readTotal(char const* suffix) {
 // each file every time (rather than caching which ones exist).
 
 static jlong getMobileTxPackets(JNIEnv* env, jobject clazz) {
-    char filename[80];
-    sprintf(filename, "/sys/class/net/%s/statistics/tx_packets", MOBILE_IFACE_NAME);
     return tryBoth(
-            filename,
-            "/sys/class/net/ppp0/statistics/tx_packets");
+            SYS_CLASS_DIR "/" MOBILE_IFACE_NAME "/statistics/tx_packets",
+            SYS_CLASS_DIR "/ppp0/statistics/tx_packets");
 }
 
 static jlong getMobileRxPackets(JNIEnv* env, jobject clazz) {
-    char filename[80];
-    sprintf(filename, "/sys/class/net/%s/statistics/rx_packets", MOBILE_IFACE_NAME);
     return tryBoth(
-            filename,
-            "/sys/class/net/ppp0/statistics/rx_packets");
+            SYS_CLASS_DIR "/" MOBILE_IFACE_NAME "/statistics/rx_packets",
+            SYS_CLASS_DIR "/ppp0/statistics/rx_packets");
 }
 
 static jlong getMobileTxBytes(JNIEnv* env, jobject clazz) {
-    char filename[80];
-    sprintf(filename, "/sys/class/net/%s/statistics/tx_bytes", MOBILE_IFACE_NAME);
     return tryBoth(
-            filename,
-            "/sys/class/net/ppp0/statistics/tx_bytes");
+            SYS_CLASS_DIR "/" MOBILE_IFACE_NAME "/statistics/tx_bytes",
+            SYS_CLASS_DIR "/ppp0/statistics/tx_bytes");
 }
 
 static jlong getMobileRxBytes(JNIEnv* env, jobject clazz) {
-    char filename[80];
-    sprintf(filename, "/sys/class/net/%s/statistics/rx_bytes", MOBILE_IFACE_NAME);
     return tryBoth(
-            filename,
-            "/sys/class/net/ppp0/statistics/rx_bytes");
+            SYS_CLASS_DIR "/" MOBILE_IFACE_NAME "/statistics/rx_bytes",
+            SYS_CLASS_DIR "/ppp0/statistics/rx_bytes");
 }
 
 // Total stats are read less often, so we're willing to put up
