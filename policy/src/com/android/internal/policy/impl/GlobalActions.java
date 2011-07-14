@@ -332,7 +332,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                         return false;
                     }
                 },
-                // next: screenshot
+                /* next: screenshot
                 new SinglePressAction(com.android.internal.R.drawable.ic_lock_screenshot, R.string.global_action_screenshot) {
                     public void onPress() {
                         Intent intent = new Intent("android.intent.action.SCREENSHOT");
@@ -346,7 +346,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
                     public boolean showBeforeProvisioning() {
                         return true;
                     }
-                },
+                },*/
                 // next: reboot
                 new SinglePressAction(com.android.internal.R.drawable.ic_lock_reboot, R.string.global_action_reboot) {
                     public void onPress() {
