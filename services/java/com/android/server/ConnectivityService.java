@@ -965,8 +965,20 @@ public class ConnectivityService extends IConnectivityManager.Stub {
      */
     public boolean getMobileDataEnabled() {
         enforceAccessPermission();
+		/* CML: Ahora se controla si por defecto está habilitado o no desde		
+		 * El build.properties del device
+		 */
+		int defaultConnected;
+		try
+		{
+			defaultConnected = SystemProperties.getInt("ro.data.on", 0);
+		}
+		catch(NumberFormatException ne)
+		{
+			defaultConnected = 0;
+		}
         boolean retVal = Settings.Secure.getInt(mContext.getContentResolver(),
-                Settings.Secure.MOBILE_DATA, 0) == 1;
+                Settings.Secure.MOBILE_DATA, defaultConnected) == 1;
 
         if (DBG) Slog.d(TAG, "getMobileDataEnabled returning " + retVal);
         return retVal;
