@@ -2193,14 +2193,6 @@
     <!--Application killed toast -->
     <string name="app_killed_message">應用程式已被結束</string>
 
-    <!-- Phone goggles -->
-    <string name="phone_goggles_problem_count">問題＃%1$d：</string>
-    <string name="phone_goggles_description">在 %2$d 秒內解答以下 %1$d 條數學題才可撥出通訊。</string>
-    <plurals name="phone_goggles_countdown">
-        <item quantity="one">剩餘 %d 秒</item>
-        <item quantity="other">剩餘 %d 秒</item>
-    </plurals>
-
     <!-- Title of an application permission that lets an application view/edit revoked permissions. -->
     <string name="permlab_revokePermissions">允許檢視及編輯被撤消的權限。不應使用於正常的應用程式。</string>
     <!-- Description of an application permission that lets lets an application view/edit revoked permissions. -->

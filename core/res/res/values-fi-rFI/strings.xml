@@ -840,10 +840,4 @@
 
     <string name="app_killed_message">Sovellus lopetettu</string>
 
-    <string name="phone_goggles_problem_count">Tehtävä #%1$d: </string>
-    <string name="phone_goggles_description">Ratkaise %1$d seuraavista matematiikkatehtävistä alle %2$d sekunnissa, jotta voit jatkaa kommunikointia.</string>
-    <plurals name="phone_goggles_countdown">
-        <item quantity="one">%d sekunti jäljellä</item>
-        <item quantity="other">%d sekuntia jäljellä</item>
-    </plurals>
 </resources>
