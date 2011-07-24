@@ -920,11 +920,4 @@
     <!--Application killed toast -->
     <string name="app_killed_message">应用程序已结束</string>
 
-    <!-- Phone goggles -->
-    <string name="phone_goggles_problem_count">问题 #%1$d: </string>
-    <string name="phone_goggles_description">在 %2$d 秒内解决 %1$d 个数学问题以执行您的通信。</string>
-    <plurals name="phone_goggles_countdown">
-        <item quantity="one">还剩 %d 秒</item>
-        <item quantity="other">还剩 %d 秒</item>
-    </plurals>
 </resources>

@@ -932,12 +932,6 @@
     <string name="media_shared" product="default" msgid="5706130568133540435">"Наразі комп\'ютер використовує карту SD."</string>
     <string name="media_unknown_state" msgid="729192782197290385">"Зовнішні носії в невідомому стані."</string>
     <string name="app_killed_message">Програму знищено</string>
-    <string name="phone_goggles_problem_count">Завдання №%1$d: </string>
-    <string name="phone_goggles_description">Щоб отримати змогу спілкуватись вирішіть %1$d завдань з математики менш ніж за %2$d сек.</string>
-    <plurals name="phone_goggles_countdown">
-        <item quantity="one">Залишилася %d сек.</item>
-        <item quantity="other">Залишилося %d сек.</item>
-    </plurals>
     <string name="permlab_revokePermissions">Дозволяє переглядати та змінювати дозволи програм. Не призначено для використання звичайними програмами.</string>
     <string name="permdesc_revokePermissions">Дозволяє зчитувати та записувати дозволи програм. Не призначено для використання звичайними програмами.</string>
 </resources>

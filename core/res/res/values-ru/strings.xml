@@ -922,14 +922,6 @@
 
     <string name="lockscreen_phone_label">Телефон</string>
 
-   <!-- Phone goggles -->
-    <string name="phone_goggles_problem_count">Задача #%1$d: </string>
-    <string name="phone_goggles_description">Решите %1$d математические задачи не менее чем за %2$d, что бы совершить исходящее соединение.</string>
-    <plurals name="phone_goggles_countdown">
-        <item quantity="one">%d сек. осталось</item>
-        <item quantity="other">%d сек. осталось</item>
-    </plurals>
-
     <!-- label for item that reboots the phone in phone options dialog -->
     <string name="global_action_choose_profile">Профиль</string>
 

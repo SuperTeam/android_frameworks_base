@@ -105,7 +105,7 @@ ANDROID_SINGLETON_STATIC_INSTANCE(SensorDevice)
 static ssize_t addDummyLGESensor(sensor_t const **list, ssize_t count) {
     struct sensor_t dummy_light =     {
                   name            : "Dummy LGE-Star light sensor",
-                  vendor          : "CyanogenMod",
+                  vendor          : "SuperAosp",
                   version         : 1,
                   handle          : SENSOR_TYPE_LIGHT,
                   type            : SENSOR_TYPE_LIGHT,

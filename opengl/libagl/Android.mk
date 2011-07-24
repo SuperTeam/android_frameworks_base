@@ -12,7 +12,7 @@ LOCAL_SRC_FILES:= \
 	texture.cpp		            \
     Tokenizer.cpp               \
     TokenManager.cpp            \
-    TextureObjectManager.cpp.arm    \
+    TextureObjectManager.cpp    \
     BufferObjectManager.cpp     \
 	array.cpp.arm		        \
 	fp.cpp.arm		            \
