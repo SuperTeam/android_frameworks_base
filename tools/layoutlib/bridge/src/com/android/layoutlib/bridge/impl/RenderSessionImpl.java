@@ -22,14 +22,12 @@ import static com.android.ide.common.rendering.api.Result.Status.ERROR_UNKNOWN;
 import static com.android.ide.common.rendering.api.Result.Status.ERROR_VIEWGROUP_NO_CHILDREN;
 import static com.android.ide.common.rendering.api.Result.Status.SUCCESS;
 
-import com.android.ide.common.rendering.api.AdapterBinding;
 import com.android.ide.common.rendering.api.IAnimationListener;
 import com.android.ide.common.rendering.api.ILayoutPullParser;
 import com.android.ide.common.rendering.api.IProjectCallback;
 import com.android.ide.common.rendering.api.RenderParams;
 import com.android.ide.common.rendering.api.RenderResources;
 import com.android.ide.common.rendering.api.RenderSession;
-import com.android.ide.common.rendering.api.ResourceReference;
 import com.android.ide.common.rendering.api.ResourceValue;
 import com.android.ide.common.rendering.api.Result;
 import com.android.ide.common.rendering.api.SessionParams;
@@ -46,8 +44,6 @@ import com.android.layoutlib.bridge.android.BridgeWindowSession;
 import com.android.layoutlib.bridge.android.BridgeXmlBlockParser;
 import com.android.layoutlib.bridge.bars.PhoneSystemBar;
 import com.android.layoutlib.bridge.bars.TitleBar;
-import com.android.layoutlib.bridge.impl.binding.FakeAdapter;
-import com.android.layoutlib.bridge.impl.binding.FakeExpandableAdapter;
 import com.android.resources.ResourceType;
 import com.android.resources.ScreenSize;
 import com.android.util.Pair;
@@ -66,14 +62,8 @@ import android.view.ViewGroup;
 import android.view.View.AttachInfo;
 import android.view.View.MeasureSpec;
 import android.view.ViewGroup.LayoutParams;
-import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.AbsListView;
-import android.widget.AbsSpinner;
-import android.widget.AdapterView;
-import android.widget.ExpandableListView;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TabHost.TabSpec;
@@ -278,9 +268,6 @@ public class RenderSessionImpl extends RenderAction<SessionParams> {
 
             View view = mInflater.inflate(mBlockParser, mContentRoot);
 
-            // done with the parser, pop it.
-            context.popParser();
-
             // set the AttachInfo on the root view.
             AttachInfo info = new AttachInfo(new BridgeWindowSession(), new BridgeWindow(),
                     new Handler(), null);
@@ -466,7 +453,7 @@ public class RenderSessionImpl extends RenderAction<SessionParams> {
                 mViewRoot.draw(mCanvas);
             }
 
-            mViewInfoList = startVisitingViews(mViewRoot, 0, params.getExtendedViewInfoMode());
+            mViewInfoList = startVisitingViews(mViewRoot, 0);
 
             // success!
             return SUCCESS.createResult();
@@ -888,75 +875,6 @@ public class RenderSessionImpl extends RenderAction<SessionParams> {
             throws PostInflateException {
         if (view instanceof TabHost) {
             setupTabHost((TabHost)view, projectCallback);
-        } else if (view instanceof AdapterView<?>) {
-            // get the view ID.
-            int id = view.getId();
-
-            BridgeContext context = getContext();
-
-            // get a ResourceReference from the integer ID.
-            ResourceReference listRef = context.resolveId(id);
-
-            if (listRef != null) {
-                SessionParams params = getParams();
-                AdapterBinding binding = params.getAdapterBindings().get(listRef);
-
-                // if there was no adapter binding, trying to get it from the call back.
-                if (binding == null) {
-                    binding = params.getProjectCallback().getAdapterBinding(listRef,
-                            context.getViewKey(view), view);
-                }
-
-                if (binding != null) {
-
-                    if (view instanceof AbsListView) {
-                        if ((binding.getFooterCount() > 0 || binding.getHeaderCount() > 0) &&
-                                view instanceof ListView) {
-                            ListView list = (ListView) view;
-
-                            boolean skipCallbackParser = false;
-
-                            int count = binding.getHeaderCount();
-                            for (int i = 0 ; i < count ; i++) {
-                                Pair<View, Boolean> pair = context.inflateView(
-                                        binding.getHeaderAt(i),
-                                        list, false /*attachToRoot*/, skipCallbackParser);
-                                if (pair.getFirst() != null) {
-                                    list.addHeaderView(pair.getFirst());
-                                }
-
-                                skipCallbackParser |= pair.getSecond();
-                            }
-
-                            count = binding.getFooterCount();
-                            for (int i = 0 ; i < count ; i++) {
-                                Pair<View, Boolean> pair = context.inflateView(
-                                        binding.getFooterAt(i),
-                                        list, false /*attachToRoot*/, skipCallbackParser);
-                                if (pair.getFirst() != null) {
-                                    list.addFooterView(pair.getFirst());
-                                }
-
-                                skipCallbackParser |= pair.getSecond();
-                            }
-                        }
-
-                        if (view instanceof ExpandableListView) {
-                            ((ExpandableListView) view).setAdapter(
-                                    new FakeExpandableAdapter(
-                                            listRef, binding, params.getProjectCallback()));
-                        } else {
-                            ((AbsListView) view).setAdapter(
-                                    new FakeAdapter(
-                                            listRef, binding, params.getProjectCallback()));
-                        }
-                    } else if (view instanceof AbsSpinner) {
-                        ((AbsSpinner) view).setAdapter(
-                                new FakeAdapter(
-                                        listRef, binding, params.getProjectCallback()));
-                    }
-                }
-            }
         } else if (view instanceof ViewGroup) {
             ViewGroup group = (ViewGroup)view;
             final int count = group.getChildCount();
@@ -1041,7 +959,7 @@ public class RenderSessionImpl extends RenderAction<SessionParams> {
         }
     }
 
-    private List<ViewInfo> startVisitingViews(View view, int offset, boolean setExtendedInfo) {
+    private List<ViewInfo> startVisitingViews(View view, int offset) {
         if (view == null) {
             return null;
         }
@@ -1050,7 +968,7 @@ public class RenderSessionImpl extends RenderAction<SessionParams> {
         offset += view.getTop();
 
         if (view == mContentRoot) {
-            return visitAllChildren(mContentRoot, offset, setExtendedInfo);
+            return visitAllChildren(mContentRoot, offset);
         }
 
         // otherwise, look for mContentRoot in the children
@@ -1058,8 +976,7 @@ public class RenderSessionImpl extends RenderAction<SessionParams> {
             ViewGroup group = ((ViewGroup) view);
 
             for (int i = 0; i < group.getChildCount(); i++) {
-                List<ViewInfo> list = startVisitingViews(group.getChildAt(i), offset,
-                        setExtendedInfo);
+                List<ViewInfo> list = startVisitingViews(group.getChildAt(i), offset);
                 if (list != null) {
                     return list;
                 }
@@ -1074,9 +991,8 @@ public class RenderSessionImpl extends RenderAction<SessionParams> {
      * bounds of all the views.
      * @param view the root View
      * @param offset an offset for the view bounds.
-     * @param setExtendedInfo whether to set the extended view info in the {@link ViewInfo} object.
      */
-    private ViewInfo visit(View view, int offset, boolean setExtendedInfo) {
+    private ViewInfo visit(View view, int offset) {
         if (view == null) {
             return null;
         }
@@ -1086,22 +1002,9 @@ public class RenderSessionImpl extends RenderAction<SessionParams> {
                 view.getLeft(), view.getTop() + offset, view.getRight(), view.getBottom() + offset,
                 view, view.getLayoutParams());
 
-        if (setExtendedInfo) {
-            MarginLayoutParams marginParams = null;
-            LayoutParams params = view.getLayoutParams();
-            if (params instanceof MarginLayoutParams) {
-                marginParams = (MarginLayoutParams) params;
-            }
-            result.setExtendedInfo(view.getBaseline(),
-                    marginParams != null ? marginParams.leftMargin : 0,
-                    marginParams != null ? marginParams.topMargin : 0,
-                    marginParams != null ? marginParams.rightMargin : 0,
-                    marginParams != null ? marginParams.bottomMargin : 0);
-        }
-
         if (view instanceof ViewGroup) {
             ViewGroup group = ((ViewGroup) view);
-            result.setChildren(visitAllChildren(group, 0 /*offset*/, setExtendedInfo));
+            result.setChildren(visitAllChildren(group, 0 /*offset*/));
         }
 
         return result;
@@ -1112,17 +1015,15 @@ public class RenderSessionImpl extends RenderAction<SessionParams> {
      * containing the bounds of all the views.
      * @param view the root View
      * @param offset an offset for the view bounds.
-     * @param setExtendedInfo whether to set the extended view info in the {@link ViewInfo} object.
      */
-    private List<ViewInfo> visitAllChildren(ViewGroup viewGroup, int offset,
-            boolean setExtendedInfo) {
+    private List<ViewInfo> visitAllChildren(ViewGroup viewGroup, int offset) {
         if (viewGroup == null) {
             return null;
         }
 
         List<ViewInfo> children = new ArrayList<ViewInfo>();
         for (int i = 0; i < viewGroup.getChildCount(); i++) {
-            children.add(visit(viewGroup.getChildAt(i), offset, setExtendedInfo));
+            children.add(visit(viewGroup.getChildAt(i), offset));
         }
         return children;
     }
