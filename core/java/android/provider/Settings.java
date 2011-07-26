@@ -2240,8 +2240,8 @@ public final class Settings {
          * Whether to move to compact carrier label in notification dropdown
          *
          * @hide
-         */
-        public static final String STATUS_BAR_COMPACT_CARRIER = "status_bar_compact_carrier";
+         //
+        public static final String STATUS_BAR_COMPACT_CARRIER = "status_bar_compact_carrier";*/
 
         /**
          * Whether to display the status bar on top or bottom
