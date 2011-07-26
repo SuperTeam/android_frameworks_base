@@ -1084,15 +1084,7 @@ public class BluetoothService extends IBluetooth.Stub {
             setDiscoverableTimeout(duration);
             pairable = true;
             discoverable = true;
-            Message msg = mHandler.obtainMessage(MESSAGE_DISCOVERABLE_TIMEOUT);
-            if (duration > 0)
-            {
-                mHandler.sendMessageDelayed(msg, duration * 1000);
-                if (DBG) Log.d(TAG, "BT Discoverable for " + duration + " seconds");
-            }
-            else
-                if (DBG) Log.d(TAG, "BT Discoverable always");
-            
+            if (DBG) Log.d(TAG, "BT Discoverable for " + duration + " seconds");
             break;
         default:
             Log.w(TAG, "Requested invalid scan mode " + mode);
