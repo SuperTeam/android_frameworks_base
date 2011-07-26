@@ -2402,8 +2402,8 @@ public final class Settings {
          * Whether to use compact carrier label layout
          *
          * @hide
-         //
-        public static final String STATUS_BAR_COMPACT_CARRIER = "status_bar_compact_carrier";*/
+         */
+        public static final String STATUS_BAR_COMPACT_CARRIER = "status_bar_compact_carrier";
 
          /**
          * Whether to control brightness from status bar
