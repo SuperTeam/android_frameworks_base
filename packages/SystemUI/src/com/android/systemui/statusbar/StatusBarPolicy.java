@@ -1102,6 +1102,7 @@ public class StatusBarPolicy {
     }
 
     private final void updateSignalStrength() {
+        updateSignalStrengthDbm();
         if (mShowCmSignal) {
             mService.setIconVisibility("phone_signal", false);
             return;
@@ -1152,20 +1153,32 @@ public class StatusBarPolicy {
             // If 3G(EV) and 1x network are available than 3G should be
             // displayed, displayed RSSI should be from the EV side.
             // If a voice call is made then RSSI should switch to 1x.
-            if ((mPhoneState == TelephonyManager.CALL_STATE_IDLE) && isEvdo()
-                && !mAlwaysUseCdmaRssi) {
-                iconLevel = getEvdoLevel();
-                if (false) {
-                    Slog.d(TAG, "use Evdo level=" + iconLevel + " to replace Cdma Level=" + getCdmaLevel());
-                }
+
+            // Samsung CDMA devices handle signal strength display differently
+            // relying only on cdmaDbm - thanks Adr0it for the assistance here
+            if (SystemProperties.get("ro.ril.samsung_cdma").equals("true")) {
+                final int cdmaDbm = mSignalStrength.getCdmaDbm();
+                if (cdmaDbm >= -75) iconLevel = 4;
+                else if (cdmaDbm >= -85) iconLevel = 3;
+                else if (cdmaDbm >= -95) iconLevel = 2;
+                else if (cdmaDbm >= -100) iconLevel = 1;
+                else iconLevel = 0;
             } else {
-                if ((mPhoneState == TelephonyManager.CALL_STATE_IDLE) && isEvdo()){
+                if ((mPhoneState == TelephonyManager.CALL_STATE_IDLE) && isEvdo()
+                    && !mAlwaysUseCdmaRssi) {
                     iconLevel = getEvdoLevel();
                     if (false) {
                         Slog.d(TAG, "use Evdo level=" + iconLevel + " to replace Cdma Level=" + getCdmaLevel());
                     }
                 } else {
-                    iconLevel = getCdmaLevel();
+                    if ((mPhoneState == TelephonyManager.CALL_STATE_IDLE) && isEvdo()){
+                        iconLevel = getEvdoLevel();
+                        if (false) {
+                            Slog.d(TAG, "use Evdo level=" + iconLevel + " to replace Cdma Level=" + getCdmaLevel());
+                        }
+                    } else {
+                        iconLevel = getCdmaLevel();
+                    }
                 }
             }
         }
@@ -1214,6 +1227,24 @@ public class StatusBarPolicy {
         else levelEvdoSnr = 0;
 
         return (levelEvdoDbm < levelEvdoSnr) ? levelEvdoDbm : levelEvdoSnr;
+    }
+
+    public void updateSignalStrengthDbm() {
+        int dBm = -1;
+
+        if(!mSignalStrength.isGsm()) {
+            dBm = mSignalStrength.getCdmaDbm();
+        } else {
+            int gsmSignalStrength = mSignalStrength.getGsmSignalStrength();
+            int asu = (gsmSignalStrength == 99 ? -1 : gsmSignalStrength);
+            if (asu != -1) {
+                dBm = -113 + 2*asu;
+            }
+        }
+
+        Intent dbmIntent = new Intent(Intent.ACTION_SIGNAL_DBM_CHANGED);
+        dbmIntent.putExtra("dbm", dBm);
+        mContext.sendBroadcast(dbmIntent);
     }
 
     private final void updateDataNetType(int net) {
