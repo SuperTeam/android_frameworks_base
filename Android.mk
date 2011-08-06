@@ -120,14 +120,6 @@ LOCAL_SRC_FILES += \
 	core/java/android/net/IConnectivityManager.aidl \
 	core/java/android/net/INetworkManagementEventObserver.aidl \
 	core/java/android/net/IThrottleManager.aidl \
-	core/java/android/nfc/ILlcpConnectionlessSocket.aidl \
-	core/java/android/nfc/ILlcpServiceSocket.aidl \
-	core/java/android/nfc/ILlcpSocket.aidl \
-	core/java/android/nfc/INfcAdapter.aidl \
-	core/java/android/nfc/INfcAdapterExtras.aidl \
-	core/java/android/nfc/INfcTag.aidl \
-	core/java/android/nfc/IP2pInitiator.aidl \
-	core/java/android/nfc/IP2pTarget.aidl \
 	core/java/android/os/IHardwareService.aidl \
 	core/java/android/os/IMessenger.aidl \
 	core/java/android/os/INetworkManagementService.aidl \
@@ -256,9 +248,6 @@ aidl_files := \
 	frameworks/base/core/java/android/content/res/Configuration.aidl \
 	frameworks/base/core/java/android/appwidget/AppWidgetProviderInfo.aidl \
 	frameworks/base/core/java/android/net/Uri.aidl \
-	frameworks/base/core/java/android/nfc/NdefMessage.aidl \
-	frameworks/base/core/java/android/nfc/NdefRecord.aidl \
-	frameworks/base/core/java/android/nfc/Tag.aidl \
 	frameworks/base/core/java/android/os/Bundle.aidl \
 	frameworks/base/core/java/android/os/DropBoxManager.aidl \
 	frameworks/base/core/java/android/os/ParcelFileDescriptor.aidl \

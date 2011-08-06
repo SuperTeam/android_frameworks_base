@@ -17,105 +17,6 @@
 
 package android.app;
 
-import com.android.internal.policy.PolicyManager;
-import com.android.internal.util.XmlUtils;
-import com.google.android.collect.Maps;
-
-import org.xmlpull.v1.XmlPullParserException;
-
-import android.accounts.AccountManager;
-import android.accounts.IAccountManager;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.Context;
-import android.content.ContextWrapper;
-import android.content.IContentProvider;
-import android.content.IIntentReceiver;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.content.ReceiverCallNotAllowedException;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.ComponentInfo;
-import android.content.pm.FeatureInfo;
-import android.content.pm.IPackageDataObserver;
-import android.content.pm.IPackageDeleteObserver;
-import android.content.pm.IPackageInstallObserver;
-import android.content.pm.IPackageMoveObserver;
-import android.content.pm.IPackageManager;
-import android.content.pm.IPackageStatsObserver;
-import android.content.pm.InstrumentationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.ParceledListSlice;
-import android.content.pm.PermissionGroupInfo;
-import android.content.pm.PermissionInfo;
-import android.content.pm.ProviderInfo;
-import android.content.pm.ResolveInfo;
-import android.content.pm.ServiceInfo;
-import android.content.pm.PackageParser.Package;
-import android.content.res.AssetManager;
-import android.content.res.Configuration;
-import android.content.res.CustomTheme;
-import android.content.res.Resources;
-import android.content.res.XmlResourceParser;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.hardware.SensorManager;
-import android.hardware.usb.IUsbManager;
-import android.hardware.usb.UsbManager;
-import android.location.ILocationManager;
-import android.location.LocationManager;
-import android.media.AudioManager;
-import android.net.ConnectivityManager;
-import android.net.IConnectivityManager;
-import android.net.ThrottleManager;
-import android.net.IThrottleManager;
-import android.net.Uri;
-import android.net.wifi.IWifiManager;
-import android.net.wifi.WifiManager;
-import android.net.wimax.WimaxHelper;
-import android.net.wimax.WimaxManagerConstants;
-import android.nfc.NfcManager;
-import android.os.Binder;
-import android.os.Bundle;
-import android.os.DropBoxManager;
-import android.os.Environment;
-import android.os.FileUtils;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.IPowerManager;
-import android.os.Looper;
-import android.os.Parcel;
-import android.os.PowerManager;
-import android.os.Process;
-import android.os.RemoteException;
-import android.os.ServiceManager;
-import android.os.StatFs;
-import android.os.Vibrator;
-import android.os.FileUtils.FileStatus;
-import android.os.storage.StorageManager;
-import android.provider.Settings;
-import android.telephony.TelephonyManager;
-import android.text.ClipboardManager;
-import android.util.AndroidRuntimeException;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
-import android.view.LayoutInflater;
-import android.view.WindowManagerImpl;
-import android.view.accessibility.AccessibilityManager;
-import android.view.inputmethod.InputMethodManager;
-import android.accounts.AccountManager;
-import android.accounts.IAccountManager;
-import android.app.admin.DevicePolicyManager;
-import com.android.internal.os.IDropBoxManagerService;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -133,7 +34,95 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
+
+import org.xmlpull.v1.XmlPullParserException;
+
+import android.accounts.AccountManager;
+import android.accounts.IAccountManager;
+import android.app.admin.DevicePolicyManager;
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
+import android.content.ContentResolver;
+import android.content.Context;
+import android.content.ContextWrapper;
+import android.content.IContentProvider;
+import android.content.IIntentReceiver;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.IntentSender;
+import android.content.ReceiverCallNotAllowedException;
+import android.content.ServiceConnection;
+import android.content.SharedPreferences;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.FeatureInfo;
+import android.content.pm.IPackageDataObserver;
+import android.content.pm.IPackageDeleteObserver;
+import android.content.pm.IPackageInstallObserver;
+import android.content.pm.IPackageManager;
+import android.content.pm.IPackageMoveObserver;
+import android.content.pm.IPackageStatsObserver;
+import android.content.pm.InstrumentationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ParceledListSlice;
+import android.content.pm.PermissionGroupInfo;
+import android.content.pm.PermissionInfo;
+import android.content.pm.ProviderInfo;
+import android.content.pm.ResolveInfo;
+import android.content.pm.ServiceInfo;
+import android.content.res.AssetManager;
+import android.content.res.Resources;
+import android.content.res.XmlResourceParser;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
+import android.hardware.SensorManager;
+import android.hardware.usb.IUsbManager;
+import android.hardware.usb.UsbManager;
+import android.location.ILocationManager;
+import android.location.LocationManager;
+import android.media.AudioManager;
+import android.net.ConnectivityManager;
+import android.net.IConnectivityManager;
+import android.net.IThrottleManager;
+import android.net.ThrottleManager;
+import android.net.Uri;
+import android.net.wifi.IWifiManager;
+import android.net.wifi.WifiManager;
+import android.net.wimax.WimaxHelper;
+import android.net.wimax.WimaxManagerConstants;
+import android.os.Binder;
+import android.os.Bundle;
+import android.os.DropBoxManager;
+import android.os.Environment;
+import android.os.FileUtils;
+import android.os.FileUtils.FileStatus;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.IPowerManager;
+import android.os.Looper;
+import android.os.PowerManager;
+import android.os.Process;
+import android.os.RemoteException;
+import android.os.ServiceManager;
+import android.os.Vibrator;
+import android.os.storage.StorageManager;
+import android.telephony.TelephonyManager;
+import android.text.ClipboardManager;
+import android.util.AndroidRuntimeException;
+import android.util.Log;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
+import android.view.WindowManagerImpl;
+import android.view.accessibility.AccessibilityManager;
+import android.view.inputmethod.InputMethodManager;
+
+import com.android.internal.os.IDropBoxManagerService;
+import com.android.internal.policy.PolicyManager;
+import com.android.internal.util.XmlUtils;
+import com.google.android.collect.Maps;
 
 class ReceiverRestrictedContext extends ContextWrapper {
     ReceiverRestrictedContext(Context base) {
@@ -216,7 +205,6 @@ class ContextImpl extends Context {
     private DevicePolicyManager mDevicePolicyManager = null;
     private UiModeManager mUiModeManager = null;
     private DownloadManager mDownloadManager = null;
-    private NfcManager mNfcManager = null;
 
     private final Object mSync = new Object();
 
@@ -1011,8 +999,6 @@ class ContextImpl extends Context {
             return getUiModeManager();
         } else if (DOWNLOAD_SERVICE.equals(name)) {
             return getDownloadManager();
-        } else if (NFC_SERVICE.equals(name)) {
-            return getNfcManager();
         } else if (WimaxManagerConstants.WIMAX_SERVICE.equals(name)) {
             return getWimaxManager();
         }
@@ -1261,15 +1247,6 @@ class ContextImpl extends Context {
             }
         }
         return mDownloadManager;
-    }
-
-    private NfcManager getNfcManager() {
-        synchronized (mSync) {
-            if (mNfcManager == null) {
-                mNfcManager = new NfcManager(this);
-            }
-        }
-        return mNfcManager;
     }
 
     private Object getWimaxManager() {
@@ -2069,7 +2046,6 @@ class ContextImpl extends Context {
             }
         }
 
-        @SuppressWarnings("unchecked")
         @Override
         public List<PackageInfo> getInstalledThemePackages() {
             try {
@@ -2255,15 +2231,6 @@ class ContextImpl extends Context {
             try {
                 Resources r = getResourcesForApplication(appInfo);
                 dr = r.getDrawable(resid);
-                if (false) {
-                    RuntimeException e = new RuntimeException("here");
-                    e.fillInStackTrace();
-                    Log.w(TAG, "Getting drawable 0x" + Integer.toHexString(resid)
-                            + " from package " + packageName
-                            + ": app scale=" + r.getCompatibilityInfo().applicationScale
-                            + ", caller scale=" + mContext.getResources().getCompatibilityInfo().applicationScale,
-                            e);
-                }
                 if (DEBUG_ICONS) Log.v(TAG, "Getting drawable 0x"
                         + Integer.toHexString(resid) + " from " + r
                         + ": " + dr);
@@ -2479,18 +2446,6 @@ class ContextImpl extends Context {
             ResourceName(String _packageName, int _iconId) {
                 packageName = _packageName;
                 iconId = _iconId;
-            }
-
-            ResourceName(ApplicationInfo aInfo, int _iconId) {
-                this(aInfo.packageName, _iconId);
-            }
-
-            ResourceName(ComponentInfo cInfo, int _iconId) {
-                this(cInfo.applicationInfo.packageName, _iconId);
-            }
-
-            ResourceName(ResolveInfo rInfo, int _iconId) {
-                this(rInfo.activityInfo.applicationInfo.packageName, _iconId);
             }
 
             @Override
@@ -3097,7 +3052,6 @@ class ContextImpl extends Context {
                                 }
                                 mMap.remove(k);
                             } else {
-                                boolean isSame = false;
                                 if (mMap.containsKey(k)) {
                                     Object existingValue = mMap.get(k);
                                     if (existingValue != null && existingValue.equals(v)) {
