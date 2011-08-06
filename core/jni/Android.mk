@@ -67,8 +67,6 @@ LOCAL_SRC_FILES:= \
 	android_net_TrafficStats.cpp \
 	android_net_wifi_Wifi.cpp \
 	android_nio_utils.cpp \
-	android_nfc_NdefMessage.cpp \
-	android_nfc_NdefRecord.cpp \
 	android_pim_EventRecurrence.cpp \
 	android_text_format_Time.cpp \
 	android_security_Md5MessageDigest.cpp \
@@ -145,6 +143,7 @@ LOCAL_SRC_FILES:= \
     android_content_res_Configuration.cpp
 
 ifeq ($(BOARD_HAVE_FM_RADIO),true)
+	LOCAL_CFLAGS += -DHAVE_FM_RADIO
     ifeq ($(BOARD_FM_DEVICE),)
         BOARD_FM_DEVICE := $(BOARD_WLAN_DEVICE)
     endif
@@ -220,8 +219,7 @@ LOCAL_SHARED_LIBRARIES := \
 	libicui18n \
 	libmedia \
 	libwpa_client \
-	libjpeg \
-	libnfc_ndef
+	libjpeg
 
 LOCAL_STATIC_LIBRARIES := libreboot
 
