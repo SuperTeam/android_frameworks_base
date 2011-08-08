@@ -145,6 +145,8 @@ LOCAL_SRC_FILES:= \
     android_content_res_Configuration.cpp
 
 ifeq ($(BOARD_HAVE_FM_RADIO),true)
+  LOCAL_CFLAGS += -DHAVE_FM_RADIO
+
     ifeq ($(BOARD_FM_DEVICE),)
         BOARD_FM_DEVICE := $(BOARD_WLAN_DEVICE)
     endif
