@@ -1,26 +1,25 @@
 package com.android.systemui.statusbar.powerwidget;
 
-import com.android.systemui.R;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
-import android.graphics.drawable.Drawable;
 import android.graphics.PorterDuff.Mode;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.provider.Settings;
 import android.view.View;
-import android.provider.Settings;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import android.widget.ImageView;
+
+import com.android.systemui.R;
 
 public abstract class PowerButton {
     public static final String TAG = "PowerButton";
@@ -50,7 +49,6 @@ public abstract class PowerButton {
     public static final String BUTTON_MEDIA_PLAY_PAUSE = "toggleMediaPlayPause";
     public static final String BUTTON_MEDIA_PREVIOUS = "toggleMediaPrevious";
     public static final String BUTTON_MEDIA_NEXT = "toggleMediaNext";
-    public static final String BUTTON_WIMAX = "toggleWimax";
     public static final String BUTTON_UNKNOWN = "unknown";
 
     private static final Mode MASK_MODE = Mode.SCREEN;
@@ -76,7 +74,6 @@ public abstract class PowerButton {
         BUTTONS.put(BUTTON_MEDIA_PLAY_PAUSE, MediaPlayPauseButton.class);
         BUTTONS.put(BUTTON_MEDIA_PREVIOUS, MediaPreviousButton.class);
         BUTTONS.put(BUTTON_MEDIA_NEXT, MediaNextButton.class);
-        BUTTONS.put(BUTTON_WIMAX, WimaxButton.class);
     }
     // this is a list of our currently loaded buttons
     private static final HashMap<String, PowerButton> BUTTONS_LOADED = new HashMap<String, PowerButton>();
@@ -99,7 +96,6 @@ public abstract class PowerButton {
                 if(mView != null) {
                     Context context = mView.getContext();
                     Resources res = context.getResources();
-                    int buttonLayer = R.id.power_widget_button;
                     int buttonIcon = R.id.power_widget_button_image;
                     int buttonState = R.id.power_widget_button_indic;
                     ImageView indic = (ImageView)mView.findViewById(R.id.power_widget_button_indic);

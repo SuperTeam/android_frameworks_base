@@ -16,23 +16,24 @@
 
 package com.android.server;
 
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.GregorianCalendar;
+import java.util.List;
+
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.content.Context;
 import android.content.ContentResolver;
-import android.content.ContextWrapper;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Resources;
-import android.content.res.Resources.NotFoundException;
 import android.net.ConnectivityManager;
 import android.net.IConnectivityManager;
 import android.net.MobileDataStateTracker;
 import android.net.NetworkInfo;
 import android.net.NetworkStateTracker;
 import android.net.wifi.WifiStateTracker;
-import android.net.wimax.WimaxHelper;
-import android.net.wimax.WimaxManagerConstants;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -45,18 +46,9 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.EventLog;
 import android.util.Slog;
+
 import com.android.internal.telephony.Phone;
 import com.android.server.connectivity.Tethering;
-import dalvik.system.DexClassLoader;
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.GregorianCalendar;
-import java.util.List;
 
 
 
@@ -107,7 +99,6 @@ public class ConnectivityService extends IConnectivityManager.Stub {
 
     private int mNumDnsEntries;
 
-    private boolean mTestMode;
     private static ConnectivityService sServiceInstance;
 
     private static final int ENABLED  = 1;
@@ -116,7 +107,6 @@ public class ConnectivityService extends IConnectivityManager.Stub {
     // Share the event space with NetworkStateTracker (which can't see this
     // internal class but sends us events).  If you change these, change
     // NetworkStateTracker.java too.
-    private static final int MIN_NETWORK_STATE_TRACKER_EVENT = 1;
     private static final int MAX_NETWORK_STATE_TRACKER_EVENT = 100;
 
     /**
@@ -365,8 +355,6 @@ public class ConnectivityService extends IConnectivityManager.Stub {
 
         mNumDnsEntries = 0;
 
-        mTestMode = SystemProperties.get("cm.test.mode").equals("true")
-                && SystemProperties.get("ro.build.type").equals("eng");
         /*
          * Create the network state trackers for Wi-Fi and mobile
          * data. Maybe this could be done with a factory class,
@@ -396,17 +384,6 @@ public class ConnectivityService extends IConnectivityManager.Stub {
                     mNetTrackers[netType].teardown();
                 }
                 break;
-            case ConnectivityManager.TYPE_WIMAX:
-                NetworkStateTracker nst = makeWimaxStateTracker();
-                if (nst != null) {
-                    nst.startMonitoring();
-                }
-                mNetTrackers[netType] = nst;
-                if (noMobileData) {
-                    if (DBG) Slog.d(TAG, "tearing down WiMAX networks due to setting");
-                    mNetTrackers[netType].teardown();
-                }
-                break;
             default:
                 Slog.e(TAG, "Trying to create a DataStateTracker for an unknown radio type " +
                         mNetAttributes[netType].mRadio);
@@ -424,88 +401,6 @@ public class ConnectivityService extends IConnectivityManager.Stub {
         if (DBG) {
             mInetLog = new ArrayList();
         }
-    }
-
-
-    private NetworkStateTracker makeWimaxStateTracker() {
-        //Initialize Wimax
-        DexClassLoader wimaxClassLoader;
-        Class wimaxStateTrackerClass = null;
-        Class wimaxServiceClass = null;
-        Class wimaxManagerClass;
-        String wimaxManagerClassName;
-        String wimaxServiceClassName;
-        String wimaxStateTrackerClassName;
-
-        NetworkStateTracker wimaxStateTracker = null;
-
-        boolean isWimaxEnabled = mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_wimaxEnabled);
-
-        if (isWimaxEnabled) {
-            try {
-                wimaxManagerClassName = mContext.getResources().getString(
-                        com.android.internal.R.string.config_wimaxManagerClassname);
-                wimaxServiceClassName = mContext.getResources().getString(
-                        com.android.internal.R.string.config_wimaxServiceClassname);
-                wimaxStateTrackerClassName = mContext.getResources().getString(
-                        com.android.internal.R.string.config_wimaxStateTrackerClassname);
-
-                wimaxClassLoader = WimaxHelper.getWimaxClassLoader(mContext);
-
-                try {
-                    wimaxManagerClass = wimaxClassLoader.loadClass(wimaxManagerClassName);
-                    wimaxStateTrackerClass = wimaxClassLoader.loadClass(wimaxStateTrackerClassName);
-                    wimaxServiceClass = wimaxClassLoader.loadClass(wimaxServiceClassName);
-                } catch (ClassNotFoundException ex) {
-                    ex.printStackTrace();
-                    return null;
-                }
-            } catch(Resources.NotFoundException ex) {
-                Slog.e(TAG, "Wimax Resources does not exist!!! ");
-                return null;
-            }
-
-            try {
-                Slog.v(TAG, "Starting Wimax Service... ");
-
-                Constructor wmxStTrkrConst = wimaxStateTrackerClass.getConstructor
-                        (new Class[] {Context.class,Handler.class});
-                wimaxStateTracker = (NetworkStateTracker)wmxStTrkrConst.newInstance(mContext,mHandler);
-
-                Constructor wmxSrvConst = wimaxServiceClass.getDeclaredConstructor
-                        (new Class[] {Context.class,wimaxStateTrackerClass});
-                wmxSrvConst.setAccessible(true);
-                IBinder svcInvoker = (IBinder) wmxSrvConst.newInstance(mContext,wimaxStateTracker);
-                wmxSrvConst.setAccessible(false);
-
-                ServiceManager.addService(WimaxManagerConstants.WIMAX_SERVICE, svcInvoker);
-
-            } catch(ClassCastException ex) {
-                ex.printStackTrace();
-                return null;
-            } catch (NoSuchMethodException ex) {
-                ex.printStackTrace();
-                return null;
-            } catch (InstantiationException ex) {
-                ex.printStackTrace();
-                return null;
-            } catch(IllegalAccessException ex) {
-                ex.printStackTrace();
-                return null;
-            } catch(InvocationTargetException ex) {
-                ex.printStackTrace();
-                return null;
-            } catch(Exception ex) {
-                ex.printStackTrace();
-                return null;
-            }
-        } else {
-            Slog.e(TAG, "Wimax is not enabled or not added to the network attributes!!! ");
-            return null;
-        }
-
-        return wimaxStateTracker;
     }
 
     /**
