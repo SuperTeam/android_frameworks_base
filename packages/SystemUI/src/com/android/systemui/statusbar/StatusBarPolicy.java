@@ -31,7 +31,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.ContentObserver;
-import android.graphics.drawable.Drawable;
 import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.Ringtone;
@@ -45,7 +44,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.RemoteException;
 import android.os.storage.StorageManager;
-import android.os.SystemProperties;
 import android.provider.Settings;
 import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
@@ -55,8 +53,6 @@ import android.util.Slog;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.WindowManagerImpl;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.internal.app.IBatteryStats;
@@ -66,7 +62,6 @@ import com.android.internal.telephony.cdma.EriInfo;
 import com.android.internal.telephony.cdma.TtyIntent;
 import com.android.server.am.BatteryStatsService;
 import com.android.systemui.R;
-import android.net.wimax.WimaxManagerConstants;
 
 /**
  * This class contains all of the policy about which icons are installed in the status
@@ -78,12 +73,6 @@ public class StatusBarPolicy {
 
     // message codes for the handler
     private static final int EVENT_BATTERY_CLOSE = 4;
-
-    private static final int AM_PM_STYLE_NORMAL  = 0;
-    private static final int AM_PM_STYLE_SMALL   = 1;
-    private static final int AM_PM_STYLE_GONE    = 2;
-
-    private static int AM_PM_STYLE = AM_PM_STYLE_GONE;
 
     private static final int INET_CONDITION_THRESHOLD = 50;
 
@@ -105,7 +94,6 @@ public class StatusBarPolicy {
     private int mBatteryViewSequence;
     private boolean mBatteryShowLowOnEndCall = false;
     private static final boolean SHOW_LOW_BATTERY_WARNING = true;
-    private static final boolean SHOW_BATTERY_WARNINGS_IN_CALL = true;
 
     // phone
     private TelephonyManager mPhone;
@@ -507,25 +495,6 @@ public class StatusBarPolicy {
     private int mLastWifiSignalLevel = -1;
     private boolean mIsWifiConnected = false;
 
-    //4G
-    private static final int[][] sWimaxSignalImages = {
-            { R.drawable.stat_sys_data_wimax_signal_0,
-              R.drawable.stat_sys_data_wimax_signal_1,
-              R.drawable.stat_sys_data_wimax_signal_2,
-              R.drawable.stat_sys_data_wimax_signal_3 },
-            { R.drawable.stat_sys_data_wimax_signal_0_fully,
-              R.drawable.stat_sys_data_wimax_signal_1_fully,
-              R.drawable.stat_sys_data_wimax_signal_2_fully,
-              R.drawable.stat_sys_data_wimax_signal_3_fully }
-        };
-    private static final int sWimaxDisconnectedImg =
-            R.drawable.stat_sys_data_wimax_signal_disconnected;
-    private static final int sWimaxIdleImg = R.drawable.stat_sys_data_wimax_signal_idle;
-    private boolean mIsWimaxEnabled = false;
-    private int mWimaxSignal = 0;
-    private int mWimaxState = 0;
-    private int mWimaxExtraState = 0;
-
     // state of inet connection - 0 not connected, 100 connected
     private int mInetCondition = 0;
 
@@ -587,14 +556,6 @@ public class StatusBarPolicy {
                      action.equals(ConnectivityManager.INET_CONDITION_ACTION)) {
                 // TODO - stop using other means to get wifi/mobile info
                 updateConnectivity(intent);
-            }
-            else if (action.equals(WimaxManagerConstants.WIMAX_ENABLED_STATUS_CHANGED) ||
-                     action.equals(WimaxManagerConstants.SIGNAL_LEVEL_CHANGED_ACTION) ||
-                     action.equals(WimaxManagerConstants.WIMAX_STATE_CHANGED_ACTION) ||
-                     action.equals(WimaxManagerConstants.NETWORK_STATE_CHANGED_ACTION) ||
-                     action.equals(WimaxManagerConstants.WIMAX_ENABLED_CHANGED_ACTION) ||
-                     action.equals(WimaxManagerConstants.RSSI_CHANGED_ACTION)) {
-                updateWiMAX(intent);
             }
         }
     };
@@ -683,15 +644,6 @@ public class StatusBarPolicy {
         mService.setIconVisibility("wifi", false);
         // wifi will get updated by the sticky intents
 
-        // wimax
-        //enable/disable wimax depending on the value in config.xml
-        boolean isWimaxEnabled = mContext.getResources().getBoolean(
-                com.android.internal.R.bool.config_wimaxEnabled);
-        if (isWimaxEnabled) {
-            mService.setIcon("wimax", sWimaxDisconnectedImg, 0);
-            mService.setIconVisibility("wimax", false);
-        }
-
         // TTY status
         mService.setIcon("tty",  R.drawable.stat_sys_tty_mode, 0);
         mService.setIconVisibility("tty", false);
@@ -763,12 +715,6 @@ public class StatusBarPolicy {
         filter.addAction(TtyIntent.TTY_ENABLED_CHANGE_ACTION);
         filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
         filter.addAction(ConnectivityManager.INET_CONDITION_ACTION);
-        filter.addAction(WimaxManagerConstants.WIMAX_STATE_CHANGED_ACTION);
-        filter.addAction(WimaxManagerConstants.SIGNAL_LEVEL_CHANGED_ACTION);
-        filter.addAction(WimaxManagerConstants.WIMAX_ENABLED_STATUS_CHANGED);
-        filter.addAction(WimaxManagerConstants.WIMAX_ENABLED_CHANGED_ACTION);
-        filter.addAction(WimaxManagerConstants.NETWORK_STATE_CHANGED_ACTION);
-        filter.addAction(WimaxManagerConstants.RSSI_CHANGED_ACTION);
 
         mContext.registerReceiver(mIntentReceiver, filter, null, mHandler);
 
@@ -788,10 +734,7 @@ public class StatusBarPolicy {
 
     private final void updateSyncState(Intent intent) {
         boolean isActive = intent.getBooleanExtra("active", false);
-        boolean isFailing = intent.getBooleanExtra("failing", false);
         mService.setIconVisibility("sync_active", isActive);
-        // Don't display sync failing icon: BUG 1297963 Set sync error timeout to "never"
-        //mService.setIconVisibility("sync_failing", isFailing && !isActive);
     }
 
     private final void updateBattery(Intent intent) {
@@ -805,15 +748,6 @@ public class StatusBarPolicy {
 
         boolean plugged = intent.getIntExtra("plugged", 0) != 0;
         level = intent.getIntExtra("level", -1);
-        if (false) {
-            Slog.d(TAG, "updateBattery level=" + level
-                    + " plugged=" + plugged
-                    + " mBatteryPlugged=" + mBatteryPlugged
-                    + " mBatteryLevel=" + mBatteryLevel
-                    + " mBatteryFirst=" + mBatteryFirst);
-        }
-
-        boolean oldPlugged = mBatteryPlugged;
 
         mBatteryPlugged = plugged;
         mBatteryLevel = level;
@@ -821,31 +755,11 @@ public class StatusBarPolicy {
         if (mBatteryFirst) {
             mBatteryFirst = false;
         }
-        /*
-         * No longer showing the battery view because it draws attention away
-         * from the USB storage notification. We could still show it when
-         * connected to a brick, but that could lead to the user into thinking
-         * the device does not charge when plugged into USB (since he/she would
-         * not see the same battery screen on USB as he sees on brick).
-         */
-        if (false) {
-            Slog.d(TAG, "plugged=" + plugged + " oldPlugged=" + oldPlugged + " level=" + level);
-        }
     }
 
     private void onBatteryLow(Intent intent) {
         if (SHOW_LOW_BATTERY_WARNING) {
-            if (false) {
-                Slog.d(TAG, "mPhoneState=" + mPhoneState
-                      + " mLowBatteryDialog=" + mLowBatteryDialog
-                      + " mBatteryShowLowOnEndCall=" + mBatteryShowLowOnEndCall);
-            }
-
-            if (SHOW_BATTERY_WARNINGS_IN_CALL || mPhoneState == TelephonyManager.CALL_STATE_IDLE) {
-                showLowBatteryWarning();
-            } else {
-                mBatteryShowLowOnEndCall = true;
-            }
+            showLowBatteryWarning();
         }
     }
 
@@ -854,17 +768,6 @@ public class StatusBarPolicy {
                 && SHOW_LOW_BATTERY_WARNING) {
             mLowBatteryDialog.dismiss();
             mBatteryShowLowOnEndCall = false;
-        }
-    }
-
-    private void setBatteryLevel(View parent, int id, int height, int background, int level) {
-        ImageView v = (ImageView)parent.findViewById(id);
-        LinearLayout.LayoutParams lp = (LinearLayout.LayoutParams)v.getLayoutParams();
-        lp.weight = height;
-        if (background != 0) {
-            v.setBackgroundResource(background);
-            Drawable bkg = v.getBackground();
-            bkg.setLevel(level);
         }
     }
 
@@ -935,11 +838,6 @@ public class StatusBarPolicy {
 
     private final void updateCallState(int state) {
         mPhoneState = state;
-        if (false) {
-            Slog.d(TAG, "mPhoneState=" + mPhoneState
-                    + " mLowBatteryDialog=" + mLowBatteryDialog
-                    + " mBatteryShowLowOnEndCall=" + mBatteryShowLowOnEndCall);
-        }
         if (mPhoneState == TelephonyManager.CALL_STATE_IDLE) {
             if (mBatteryShowLowOnEndCall) {
                 if (!mBatteryPlugged) {
@@ -962,12 +860,6 @@ public class StatusBarPolicy {
             mBatteryLevelTextView = null;
         }
     };
-
-    private void scheduleCloseBatteryView() {
-        Message m = mHandler.obtainMessage(EVENT_BATTERY_CLOSE);
-        m.arg1 = (++mBatteryViewSequence);
-        mHandler.sendMessageDelayed(m, 3000);
-    }
 
     private void closeLastBatteryView() {
         if (mBatteryView != null) {
@@ -1015,10 +907,6 @@ public class StatusBarPolicy {
             }
             updateSignalStrength(); // apply any change in mInetCondition
             break;
-        case ConnectivityManager.TYPE_WIMAX:
-             mInetCondition = inetCondition;
-             updateWiMAX(intent);
-             break;
         }
     }
 
@@ -1165,7 +1053,6 @@ public class StatusBarPolicy {
             // If 3G(EV) and 1x network are available than 3G should be
             // displayed, displayed RSSI should be from the EV side.
             // If a voice call is made then RSSI should switch to 1x.
-
             // Samsung CDMA devices handle signal strength display differently
             // relying only on cdmaDbm - thanks Adr0it for the assistance here
             if (SystemProperties.get("ro.ril.samsung_cdma").equals("true")) {
@@ -1179,9 +1066,6 @@ public class StatusBarPolicy {
                 if ((mPhoneState == TelephonyManager.CALL_STATE_IDLE) && isEvdo()
                     && !mAlwaysUseCdmaRssi) {
                     iconLevel = getEvdoLevel();
-                    if (false) {
-                        Slog.d(TAG, "use Evdo level=" + iconLevel + " to replace Cdma Level=" + getCdmaLevel());
-                    }
                 } else {
                     if ((mPhoneState == TelephonyManager.CALL_STATE_IDLE) && isEvdo()){
                         iconLevel = getEvdoLevel();
@@ -1469,86 +1353,6 @@ public class StatusBarPolicy {
         }
     }
 
-    private final void updateWiMAX(Intent intent) {
-        final String action = intent.getAction();
-        int iconId = sWimaxDisconnectedImg;
-
-        if (action.equals(WimaxManagerConstants.WIMAX_ENABLED_STATUS_CHANGED)) {
-            int wimaxStatus = intent.getIntExtra(WimaxManagerConstants.EXTRA_WIMAX_STATUS,
-                    WimaxManagerConstants.WIMAX_STATUS_DISABLED);
-            switch(wimaxStatus) {
-                case WimaxManagerConstants.WIMAX_STATUS_ENABLED:
-                    mIsWimaxEnabled = true;
-                    break;
-                case WimaxManagerConstants.WIMAX_STATUS_DISABLED:
-                    mIsWimaxEnabled = false;
-                    break;
-            }
-            mService.setIconVisibility("wimax", mIsWimaxEnabled);
-        } else if (action.equals(WimaxManagerConstants.WIMAX_ENABLED_CHANGED_ACTION)) {
-            int wimaxStatus = intent.getIntExtra(WimaxManagerConstants.CURRENT_WIMAX_ENABLED_STATE,
-                    WimaxManagerConstants.WIMAX_ENABLED_STATE_UNKNOWN);
-            mIsWimaxEnabled = (wimaxStatus == WimaxManagerConstants.WIMAX_ENABLED_STATE_ENABLED);
-            mService.setIconVisibility("wimax", mIsWimaxEnabled);
-        } else if (action.equals(WimaxManagerConstants.SIGNAL_LEVEL_CHANGED_ACTION)) {
-            mWimaxSignal = intent.getIntExtra(WimaxManagerConstants.EXTRA_NEW_SIGNAL_LEVEL, 0);
-        } else if (action.equals(WimaxManagerConstants.RSSI_CHANGED_ACTION)) {
-            int rssi = intent.getIntExtra(WimaxManagerConstants.EXTRA_NEW_RSSI_LEVEL, -200);
-            Slog.d(TAG, "WiMAX RSSI: " + rssi);
-            if (rssi >= 3) {
-                mWimaxSignal = 3;
-            } else if (rssi <= 0) {
-                mWimaxSignal = 0;
-            } else {
-                mWimaxSignal = rssi;
-            }
-        } else if (action.equals(WimaxManagerConstants.WIMAX_STATE_CHANGED_ACTION)) {
-            mWimaxState = intent.getIntExtra(WimaxManagerConstants.EXTRA_WIMAX_STATE,
-                    WimaxManagerConstants.WIMAX_STATE_UNKNOWN);
-            mWimaxExtraState = intent.getIntExtra(
-                    WimaxManagerConstants.EXTRA_WIMAX_STATE_DETAIL,
-                    WimaxManagerConstants.WIMAX_DEREGISTRATION);
-
-            switch(mWimaxState) {
-                case WimaxManagerConstants.WIMAX_STATE_DISCONNECTED:
-                    iconId = sWimaxDisconnectedImg;
-                    break;
-                case WimaxManagerConstants.WIMAX_STATE_CONNECTED:
-                    if(mWimaxExtraState == WimaxManagerConstants.WIMAX_IDLE) {
-                        iconId = sWimaxIdleImg;
-                    }
-                    else {
-                        iconId = sWimaxSignalImages[mInetCondition][mWimaxSignal];
-                    }
-                    break;
-            }
-            mService.setIcon("wimax", iconId, 0);
-        } else if (action.equals(WimaxManagerConstants.NETWORK_STATE_CHANGED_ACTION)) {
-            final NetworkInfo networkInfo = (NetworkInfo) intent.getParcelableExtra(WimaxManagerConstants.EXTRA_NETWORK_INFO);
-            if (networkInfo != null && networkInfo.isConnected()) {
-                iconId = sWimaxSignalImages[mInetCondition][mWimaxSignal];
-            } else if (networkInfo != null && networkInfo.isAvailable()) {
-                iconId = sWimaxIdleImg;
-            } else {
-                iconId = sWimaxDisconnectedImg;
-            }
-            mService.setIcon("wimax", iconId, 0);
-        }
-        switch(mWimaxState) {
-            case WimaxManagerConstants.WIMAX_STATE_DISCONNECTED:
-                iconId = sWimaxDisconnectedImg;
-                break;
-            case WimaxManagerConstants.WIMAX_STATE_CONNECTED:
-                if(mWimaxExtraState == WimaxManagerConstants.WIMAX_IDLE) {
-                    iconId = sWimaxIdleImg;
-                } else {
-                    iconId = sWimaxSignalImages[mInetCondition][mWimaxSignal];
-                }
-                break;
-        }
-        if (mIsWimaxEnabled) mService.setIcon("wimax", iconId, 0);
-    }
-
     private final void updateGps(Intent intent) {
         final String action = intent.getAction();
         final boolean enabled = intent.getBooleanExtra(LocationManager.EXTRA_GPS_ENABLED, false);
@@ -1568,19 +1372,14 @@ public class StatusBarPolicy {
     }
 
     private final void updateTTY(Intent intent) {
-        final String action = intent.getAction();
         final boolean enabled = intent.getBooleanExtra(TtyIntent.TTY_ENABLED, false);
-
-        if (false) Slog.v(TAG, "updateTTY: enabled: " + enabled);
 
         if (enabled) {
             // TTY is on
-            if (false) Slog.v(TAG, "updateTTY: set TTY on");
             mService.setIcon("tty", R.drawable.stat_sys_tty_mode, 0);
             mService.setIconVisibility("tty", true);
         } else {
             // TTY is off
-            if (false) Slog.v(TAG, "updateTTY: set TTY off");
             mService.setIconVisibility("tty", false);
         }
     }
@@ -1611,7 +1410,6 @@ public class StatusBarPolicy {
         }
 
         if (iconIndex == EriInfo.ROAMING_INDICATOR_OFF) {
-            if (false) Slog.v(TAG, "Cdma ROAMING_INDICATOR_OFF, removing ERI icon");
             mService.setIconVisibility("cdma_eri", false);
             return;
         }

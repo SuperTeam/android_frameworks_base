@@ -290,15 +290,7 @@ packages_to_document := \
 
 # Search through the base framework dirs for these packages.
 # The result will be relative to frameworks/base.
-fwbase_dirs_to_document := \
-	test-runner/src \
-	$(patsubst $(LOCAL_PATH)/%,%, \
-	  $(wildcard \
-	    $(foreach dir, $(FRAMEWORKS_BASE_JAVA_SRC_DIRS), \
-	      $(addprefix $(dir)/, $(packages_to_document)) \
-	     ) \
-	   ) \
-	 )
+fwbase_dirs_to_document := 
 
 # Pass a special "fake-out" version of some classes to the doc/API tools.
 # ConfigBuildFlags uses this trick to prevent certain fields from appearing
@@ -382,60 +374,7 @@ sample_dir := development/samples
 
 # the list here should match the list of samples included in the sdk samples package
 # (see development/build/sdk.atree)
-web_docs_sample_code_flags := \
-		-hdf android.hasSamples 1 \
-		-samplecode $(sample_dir)/AccessibilityService \
-		            resources/samples/AccessibilityService "Accessibility Service" \
-		-samplecode $(sample_dir)/ApiDemos \
-		            resources/samples/ApiDemos "API Demos" \
-		-samplecode $(sample_dir)/AccelerometerPlay \
-		            resources/samples/AccelerometerPlay "Accelerometer Play" \
-		-samplecode $(sample_dir)/BackupRestore \
-		            resources/samples/BackupRestore "Backup and Restore" \
-		-samplecode $(sample_dir)/BluetoothChat \
-		            resources/samples/BluetoothChat "Bluetooth Chat" \
-		-samplecode $(sample_dir)/BusinessCard \
-		            resources/samples/BusinessCard "Business Card" \
-		-samplecode $(sample_dir)/ContactManager \
-		            resources/samples/ContactManager "Contact Manager" \
-                -samplecode $(sample_dir)/CubeLiveWallpaper \
-                            resources/samples/CubeLiveWallpaper "Live Wallpaper" \
-		-samplecode $(sample_dir)/Home \
-		            resources/samples/Home "Home" \
-		-samplecode $(sample_dir)/JetBoy \
-		            resources/samples/JetBoy "JetBoy" \
-		-samplecode $(sample_dir)/LunarLander \
-		            resources/samples/LunarLander "Lunar Lander" \
-		-samplecode $(sample_dir)/MultiResolution \
-		            resources/samples/MultiResolution "Multiple Resolutions" \
-		-samplecode $(sample_dir)/NotePad \
-		            resources/samples/NotePad "Note Pad" \
-		-samplecode $(sample_dir)/SampleSyncAdapter \
-		            resources/samples/SampleSyncAdapter "Sample Sync Adapter" \
-		-samplecode $(sample_dir)/SearchableDictionary \
-		            resources/samples/SearchableDictionary "Searchable Dictionary v2" \
-		-samplecode $(sample_dir)/SipDemo \
-		            resources/samples/SipDemo "SIP Demo" \
-		-samplecode $(sample_dir)/Snake \
-		            resources/samples/Snake "Snake" \
-		-samplecode $(sample_dir)/SoftKeyboard \
-		            resources/samples/SoftKeyboard "Soft Keyboard" \
-		-samplecode $(sample_dir)/Spinner  \
-		            resources/samples/Spinner "Spinner" \
-		-samplecode $(sample_dir)/SpinnerTest \
-		            resources/samples/SpinnerTest "SpinnerTest" \
-		-samplecode $(sample_dir)/TicTacToeLib  \
-		            resources/samples/TicTacToeLib "TicTacToeLib" \
-		-samplecode $(sample_dir)/TicTacToeMain \
-		            resources/samples/TicTacToeMain "TicTacToeMain" \
-		-samplecode $(sample_dir)/Wiktionary \
-		            resources/samples/Wiktionary "Wiktionary" \
-		-samplecode $(sample_dir)/WiktionarySimple \
-		            resources/samples/WiktionarySimple "Wiktionary (Simplified)" \
-		-samplecode $(sample_dir)/VoiceRecognitionService \
-		            resources/samples/VoiceRecognitionService "Voice Recognition Service" \
-		-samplecode $(sample_dir)/NFCDemo \
-		            resources/samples/NFCDemo "NFC Demo"
+web_docs_sample_code_flags := 
 
 ## SDK version identifiers used in the published docs
   # major[.minor] version for current SDK. (full releases only)

@@ -21,10 +21,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.net.Uri;
-import android.net.wimax.WimaxHelper;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.AttributeSet;
@@ -32,15 +30,12 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
-import android.view.ViewGroup;
 
 import com.android.systemui.R;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class PowerWidget extends FrameLayout {
     private static final String TAG = "PowerWidget";
@@ -107,10 +102,6 @@ public class PowerWidget extends FrameLayout {
         if(buttons == null) {
             Log.i(TAG, "Default buttons being loaded");
             buttons = BUTTONS_DEFAULT;
-            // Add the WiMAX button if it's supported
-            if (WimaxHelper.isWimaxSupported(mContext)) {
-                buttons += BUTTON_DELIMITER + PowerButton.BUTTON_WIMAX;
-            }
         }
         Log.i(TAG, "Button list: " + buttons);
 
@@ -283,8 +274,6 @@ public class PowerWidget extends FrameLayout {
 
         @Override
         public void onChangeUri(Uri uri, boolean selfChange) {
-            ContentResolver resolver = mContext.getContentResolver();
-            Resources res = mContext.getResources();
 
             // first check if our widget buttons have changed
             if(uri.equals(Settings.System.getUriFor(Settings.System.WIDGET_BUTTONS))) {

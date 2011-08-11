@@ -91,8 +91,6 @@ import android.net.ThrottleManager;
 import android.net.Uri;
 import android.net.wifi.IWifiManager;
 import android.net.wifi.WifiManager;
-import android.net.wimax.WimaxHelper;
-import android.net.wimax.WimaxManagerConstants;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.DropBoxManager;
@@ -171,7 +169,6 @@ class ContextImpl extends Context {
     private static ThrottleManager sThrottleManager;
     private static WifiManager sWifiManager;
     private static LocationManager sLocationManager;
-    private static Object sWimaxManager;
     private static final HashMap<String, SharedPreferencesImpl> sSharedPrefs =
             new HashMap<String, SharedPreferencesImpl>();
 
@@ -999,8 +996,6 @@ class ContextImpl extends Context {
             return getUiModeManager();
         } else if (DOWNLOAD_SERVICE.equals(name)) {
             return getDownloadManager();
-        } else if (WimaxManagerConstants.WIMAX_SERVICE.equals(name)) {
-            return getWimaxManager();
         }
 
         return null;
@@ -1247,15 +1242,6 @@ class ContextImpl extends Context {
             }
         }
         return mDownloadManager;
-    }
-
-    private Object getWimaxManager() {
-        synchronized (sSync) {
-            if (sWimaxManager == null) {
-                sWimaxManager = WimaxHelper.createWimaxService(this, mMainThread.getHandler());
-            }
-        }
-        return sWimaxManager;
     }
 
     @Override
