@@ -290,7 +290,14 @@ packages_to_document := \
 
 # Search through the base framework dirs for these packages.
 # The result will be relative to frameworks/base.
-fwbase_dirs_to_document := 
+fwbase_dirs_to_document := \
+	$(patsubst $(LOCAL_PATH)/%,%, \
+	  $(wildcard \
+	    $(foreach dir, $(FRAMEWORKS_BASE_JAVA_SRC_DIRS), \
+	      $(addprefix $(dir)/, $(packages_to_document)) \
+	     ) \
+	   ) \
+	 )
 
 # Pass a special "fake-out" version of some classes to the doc/API tools.
 # ConfigBuildFlags uses this trick to prevent certain fields from appearing
@@ -370,7 +377,7 @@ framework_docs_LOCAL_ADDITIONAL_JAVA_DIR:= $(call intermediates-dir-for,JAVA_LIB
 framework_docs_LOCAL_ADDITIONAL_DEPENDENCIES := \
     frameworks/base/docs/knowntags.txt
 
-sample_dir := development/samples
+sample_dir := 
 
 # the list here should match the list of samples included in the sdk samples package
 # (see development/build/sdk.atree)
