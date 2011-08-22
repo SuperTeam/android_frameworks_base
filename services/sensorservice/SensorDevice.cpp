@@ -229,7 +229,7 @@ ssize_t SensorDevice::poll(sensors_event_t* buffer, size_t count) {
         size_t pollsDone = 0;
         //LOGV("%d buffers were requested",count);
         while (!mOldSensorsEnabled) {
-            sleep(1);
+            sleep(10);
             LOGV("Waiting...");
         }
         while (pollsDone < (size_t)mOldSensorsEnabled && pollsDone < count) {
@@ -279,9 +279,20 @@ ssize_t SensorDevice::poll(sensors_event_t* buffer, size_t count) {
                 } else {
                     buffer[pollsDone].distance = 1;
                 }
+#elif defined(ZERO_SENSORS)
+		if (buffer[pollsDone].distance >= 2)
+		{
+			buffer[pollsDone].distance = maxRange*100;
+		}
+		else
+		{
+			buffer[pollsDone].distance = 0;
+		}
 #elif defined(PROXIMITY_LIES)
-                if (buffer[pollsDone].distance >= PROXIMITY_LIES)
+		if (buffer[pollsDone].distance >= PROXIMITY_LIES)
+		{
 			buffer[pollsDone].distance = maxRange;
+		}
 #endif
                 return pollsDone+1;
             } else if (sensorType == SENSOR_TYPE_LIGHT) {

@@ -54,7 +54,6 @@ import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.os.WorkSource;
-import android.os.SystemProperties;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings;
 import android.util.EventLog;
@@ -308,36 +307,6 @@ class PowerManagerService extends IPowerManager.Stub
     private native void nativeInit();
     private native void nativeSetPowerState(boolean screenOn, boolean screenBright);
     private native void nativeStartSurfaceFlingerAnimation(int mode);
-
-    /*
-    static PrintStream mLog;
-    static {
-        try {
-            mLog = new PrintStream("/data/power.log");
-        }
-        catch (FileNotFoundException e) {
-            android.util.Slog.e(TAG, "Life is hard", e);
-        }
-    }
-    static class Log {
-        static void d(String tag, String s) {
-            mLog.println(s);
-            android.util.Slog.d(tag, s);
-        }
-        static void i(String tag, String s) {
-            mLog.println(s);
-            android.util.Slog.i(tag, s);
-        }
-        static void w(String tag, String s) {
-            mLog.println(s);
-            android.util.Slog.w(tag, s);
-        }
-        static void e(String tag, String s) {
-            mLog.println(s);
-            android.util.Slog.e(tag, s);
-        }
-    }
-    */
 
     /**
      * This class works around a deadlock between the lock in PowerManager.WakeLock
@@ -2291,9 +2260,12 @@ class PowerManagerService extends IPowerManager.Stub
      * on with user activity.  Don't use this function.
      */
     public void clearUserActivityTimeout(long now, long timeout) {
-        mContext.enforceCallingOrSelfPermission(android.Manifest.permission.DEVICE_POWER, null);
-        Slog.i(TAG, "clearUserActivity for " + timeout + "ms from now");
-        userActivity(now, timeout, false, OTHER_EVENT, false);
+	if(!SystemProperties.get("ro.product.device", "").equals("zero"))
+	{
+		mContext.enforceCallingOrSelfPermission(android.Manifest.permission.DEVICE_POWER, null);
+		Slog.i(TAG, "clearUserActivity for " + timeout + "ms from now");
+		userActivity(now, timeout, false, OTHER_EVENT, false);
+	}
     }
 
     private void userActivity(long time, long timeoutOverride, boolean noChangeLights,
@@ -3316,6 +3288,11 @@ class PowerManagerService extends IPowerManager.Stub
         }
     }
 
+    int	getProximitySensorDelay()
+    {
+	int proximitySensorDelay = SystemProperties.getInt("ro.prox.delay", PROXIMITY_SENSOR_DELAY);
+	return proximitySensorDelay;
+    }
 
     SensorEventListener mProximityListener = new SensorEventListener() {
         public void onSensorChanged(SensorEvent event) {
@@ -3334,10 +3311,10 @@ class PowerManagerService extends IPowerManager.Stub
                 if (mDebugProximitySensor) {
                     Slog.d(TAG, "mProximityListener.onSensorChanged active: " + active);
                 }
-                if (timeSinceLastEvent < PROXIMITY_SENSOR_DELAY) {
-                    // enforce delaying atleast PROXIMITY_SENSOR_DELAY before processing
+                if (timeSinceLastEvent < getProximitySensorDelay()) {
+                    // enforce delaying atleast PROXIMITY SENSOR DELAY before processing
                     mProximityPendingValue = (active ? 1 : 0);
-                    mHandler.postDelayed(mProximityTask, PROXIMITY_SENSOR_DELAY - timeSinceLastEvent);
+                    mHandler.postDelayed(mProximityTask, getProximitySensorDelay() - timeSinceLastEvent);
                     proximityTaskQueued = true;
                 } else {
                     // process the value immediately
