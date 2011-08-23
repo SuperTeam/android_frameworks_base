@@ -2260,12 +2260,9 @@ class PowerManagerService extends IPowerManager.Stub
      * on with user activity.  Don't use this function.
      */
     public void clearUserActivityTimeout(long now, long timeout) {
-	if(!SystemProperties.get("ro.product.device", "").equals("zero"))
-	{
-		mContext.enforceCallingOrSelfPermission(android.Manifest.permission.DEVICE_POWER, null);
-		Slog.i(TAG, "clearUserActivity for " + timeout + "ms from now");
-		userActivity(now, timeout, false, OTHER_EVENT, false);
-	}
+	mContext.enforceCallingOrSelfPermission(android.Manifest.permission.DEVICE_POWER, null);
+	Slog.i(TAG, "clearUserActivity for " + timeout + "ms from now");
+	userActivity(now, timeout, false, OTHER_EVENT, false);
     }
 
     private void userActivity(long time, long timeoutOverride, boolean noChangeLights,

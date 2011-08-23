@@ -229,7 +229,7 @@ ssize_t SensorDevice::poll(sensors_event_t* buffer, size_t count) {
         size_t pollsDone = 0;
         //LOGV("%d buffers were requested",count);
         while (!mOldSensorsEnabled) {
-            sleep(10);
+            sleep(1);
             LOGV("Waiting...");
         }
         while (pollsDone < (size_t)mOldSensorsEnabled && pollsDone < count) {
