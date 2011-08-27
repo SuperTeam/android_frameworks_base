@@ -443,6 +443,8 @@
         <attr name="preferenceInformationStyle" format="reference" />
         <!-- Default style for CheckBoxPreference. -->
         <attr name="checkBoxPreferenceStyle" format="reference" />
+        <!-- Default style for ItemCheckBoxPreference. -->
+        <attr name="itemCheckBoxPreferenceStyle" format="reference" />
         <!-- Default style for YesNoPreference. -->
         <attr name="yesNoPreferenceStyle" format="reference" />
         <!-- Default style for DialogPreference. -->

@@ -789,6 +789,10 @@
         <item name="android:widgetLayout">@android:layout/preference_widget_checkbox</item>
     </style>
     
+    <style name="Preference.ItemCheckBoxPreference">
+        <item name="android:widgetLayout">@android:layout/list_menu_itemcheckbox_layout</item>
+    </style>
+    
     <style name="Preference.PreferenceScreen">
     </style>
 
