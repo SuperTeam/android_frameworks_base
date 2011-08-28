@@ -47,7 +47,7 @@ public class AutoRotateButton extends PowerButton {
 
     @Override
     protected boolean handleLongClick() {
-        Intent intent = new Intent("android.settings.DISPLAY_SETTINGS");
+        Intent intent = new Intent("android.settings.ROTATION_SETTINGS");
         intent.addCategory(Intent.CATEGORY_DEFAULT);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         mView.getContext().startActivity(intent);
