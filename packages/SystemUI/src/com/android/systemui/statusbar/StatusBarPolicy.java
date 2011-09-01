@@ -24,6 +24,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothHeadset;
 import android.bluetooth.BluetoothHid;
 import android.bluetooth.BluetoothPbap;
+import android.os.SystemProperties;
 import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
