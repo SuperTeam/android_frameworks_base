@@ -17,16 +17,15 @@
 package com.android.internal.telephony;
 
 
+import java.util.List;
+
 import android.app.ActivityManagerNative;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemProperties;
-import android.preference.PreferenceManager;
 import android.telephony.CellLocation;
-import android.telephony.PhoneStateListener;
 import android.telephony.ServiceState;
 import android.telephony.SignalStrength;
 import android.util.Log;
@@ -34,10 +33,7 @@ import android.util.Log;
 import com.android.internal.telephony.cdma.CDMAPhone;
 import com.android.internal.telephony.gsm.GSMPhone;
 import com.android.internal.telephony.gsm.NetworkInfo;
-import com.android.internal.telephony.gsm.GsmDataConnection;
 import com.android.internal.telephony.test.SimulatedRadioControl;
-
-import java.util.List;
 
 public class PhoneProxy extends Handler implements Phone {
     public final static Object lockForRadioTechnologyChange = new Object();
@@ -75,19 +71,15 @@ public class PhoneProxy extends Handler implements Phone {
         case EVENT_RADIO_TECHNOLOGY_CHANGED:
             //switch Phone from CDMA to GSM or vice versa
             mOutgoingPhone = ((PhoneBase)mActivePhone).getPhoneName();
-            logd("Switching phone from " + mOutgoingPhone + "Phone to " +
-                    (mOutgoingPhone.equals("GSM") ? "CDMAPhone" : "GSMPhone") );
             boolean oldPowerState = false; // old power state to off
             if (mResetModemOnRadioTechnologyChange) {
                 if (mCommandsInterface.getRadioState().isOn()) {
                     oldPowerState = true;
-                    logd("Setting Radio Power to Off");
                     mCommandsInterface.setRadioPower(false, null);
                 }
             }
 
             if(mOutgoingPhone.equals("GSM")) {
-                logd("Make a new CDMAPhone and destroy the old GSMPhone.");
 
                 ((GSMPhone)mActivePhone).dispose();
                 Phone oldPhone = mActivePhone;
@@ -102,7 +94,6 @@ public class PhoneProxy extends Handler implements Phone {
                 ((GSMPhone)oldPhone).removeReferences();
                 oldPhone = null;
             } else {
-                logd("Make a new GSMPhone and destroy the old CDMAPhone.");
 
                 ((CDMAPhone)mActivePhone).dispose();
                 //mActivePhone = null;
@@ -120,7 +111,6 @@ public class PhoneProxy extends Handler implements Phone {
             }
 
             if (mResetModemOnRadioTechnologyChange) {
-                logd("Resetting Radio");
                 mCommandsInterface.setRadioPower(oldPowerState, null);
             }
 
@@ -145,23 +135,6 @@ public class PhoneProxy extends Handler implements Phone {
         }
         super.handleMessage(msg);
     }
-
-    private void logv(String msg) {
-        Log.v(LOG_TAG, "[PhoneProxy] " + msg);
-    }
-
-    private void logd(String msg) {
-        Log.d(LOG_TAG, "[PhoneProxy] " + msg);
-    }
-
-    private void logw(String msg) {
-        Log.w(LOG_TAG, "[PhoneProxy] " + msg);
-    }
-
-    private void loge(String msg) {
-        Log.e(LOG_TAG, "[PhoneProxy] " + msg);
-    }
-
 
     public ServiceState getServiceState() {
         return mActivePhone.getServiceState();
@@ -766,10 +739,6 @@ public class PhoneProxy extends Handler implements Phone {
 
     public void exitEmergencyCallbackMode(){
         mActivePhone.exitEmergencyCallbackMode();
-    }
-
-    public boolean isOtaSpNumber(String dialStr){
-        return mActivePhone.isOtaSpNumber(dialStr);
     }
 
     public void registerForCallWaiting(Handler h, int what, Object obj){

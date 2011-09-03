@@ -17,15 +17,10 @@
 
 package com.android.systemui.statusbar;
 
-import com.android.internal.statusbar.IStatusBarService;
-import com.android.internal.statusbar.StatusBarIcon;
-import com.android.internal.statusbar.StatusBarIconList;
-import com.android.internal.statusbar.StatusBarNotification;
-import com.android.systemui.statusbar.CmBatteryMiniIcon.SettingsObserver;
-import com.android.systemui.statusbar.powerwidget.PowerWidget;
-import com.android.systemui.R;
-import android.os.IPowerManager;
-import android.provider.Settings.SettingNotFoundException;
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+
 import android.app.ActivityManagerNative;
 import android.app.Dialog;
 import android.app.Notification;
@@ -44,18 +39,18 @@ import android.database.ContentObserver;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.IPowerManager;
 import android.os.Message;
 import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.provider.CmSystem;
 import android.provider.Settings;
+import android.provider.Settings.SettingNotFoundException;
 import android.text.TextUtils;
-import android.util.Pair;
 import android.util.Slog;
 import android.view.Display;
 import android.view.Gravity;
@@ -77,11 +72,12 @@ import android.widget.RemoteViews;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Set;
+import com.android.internal.statusbar.IStatusBarService;
+import com.android.internal.statusbar.StatusBarIcon;
+import com.android.internal.statusbar.StatusBarIconList;
+import com.android.internal.statusbar.StatusBarNotification;
+import com.android.systemui.R;
+import com.android.systemui.statusbar.powerwidget.PowerWidget;
 
 public class StatusBarService extends Service implements CommandQueue.Callbacks {
     static final String TAG = "StatusBarService";
@@ -518,16 +514,6 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
 
         final RemoteViews contentView = notification.notification.contentView;
 
-        if (false) {
-            Slog.d(TAG, "old notification: when=" + oldNotification.notification.when
-                    + " ongoing=" + oldNotification.isOngoing()
-                    + " expanded=" + oldEntry.expanded
-                    + " contentView=" + oldContentView);
-            Slog.d(TAG, "new notification: when=" + notification.notification.when
-                    + " ongoing=" + oldNotification.isOngoing()
-                    + " contentView=" + contentView);
-        }
-
         // Can we just reapply the RemoteViews in place?  If when didn't change, the order
         // didn't change.
         if (notification.notification.when == oldNotification.notification.when
@@ -884,8 +870,6 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         mStatusBarView.updateQuickNaImage();
         makeExpandedVisible();
         updateExpandedViewPos(EXPANDED_FULL_OPEN);
-
-        if (false) postStartTracing();
     }
 
     void performCollapse() {
@@ -1151,36 +1135,21 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
                                                 if (mLinger > 50) {
                                                         // Check that Auto-Brightness not enabled
                                                         Context context = mStatusBarView.getContext();
-                                                        boolean auto_brightness = false;
-                                                        int brightness_mode = 0;
+                                                        // set brightness according to x position on statusbar
+                                                        float x = (float)event.getRawX();
+                                                        float screen_width = (float)(context.getResources().getDisplayMetrics().widthPixels);
+                                                        // Brightness set from the 90% of pixels in the middle of screen, can't always get to the edges
+                                                        int new_brightness = (int)(((x - (screen_width * 0.05f))/(screen_width * 0.9f)) * (float)android.os.Power.BRIGHTNESS_ON );
+                                                        // don't let screen go completely dim or past 100% bright
+                                                        if (new_brightness < 10) new_brightness = 10;
+                                                        if (new_brightness > android.os.Power.BRIGHTNESS_ON ) new_brightness = android.os.Power.BRIGHTNESS_ON;
+                                                        // Set the brightness
                                                         try {
-                                                                brightness_mode = Settings.System.getInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS_MODE);
-                                                        }catch (SettingNotFoundException e){
-                                                                auto_brightness = false;
+                                                                IPowerManager.Stub.asInterface(ServiceManager.getService("power")).setBacklightBrightness(new_brightness);
+                                                                Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, new_brightness);
+                                                        }catch (Exception e){
+                                                                Slog.w(TAG, "Setting Brightness failed: " + e);
                                                         }
-                                                        auto_brightness = (brightness_mode == Settings.System.SCREEN_BRIGHTNESS_MODE_AUTOMATIC);
-                                                        if (auto_brightness)
-                                                        {
-                                                                // do nothing - Don't manually set brightness from statusbar
-                                                        }
-                                                        else
-                                                        {
-                                                                // set brightness according to x position on statusbar
-                                                                float x = (float)event.getRawX();
-                                                                float screen_width = (float)(context.getResources().getDisplayMetrics().widthPixels);
-                                                                // Brightness set from the 90% of pixels in the middle of screen, can't always get to the edges
-                                                                int new_brightness = (int)(((x - (screen_width * 0.05f))/(screen_width * 0.9f)) * (float)android.os.Power.BRIGHTNESS_ON );
-                                                                // don't let screen go completely dim or past 100% bright
-                                                                if (new_brightness < 10) new_brightness = 10;
-                                                                if (new_brightness > android.os.Power.BRIGHTNESS_ON ) new_brightness = android.os.Power.BRIGHTNESS_ON;
-                                                                // Set the brightness
-                                                                try {
-                                                                        IPowerManager.Stub.asInterface(ServiceManager.getService("power")).setBacklightBrightness(new_brightness);
-                                                                        Settings.System.putInt(context.getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, new_brightness);
-                                                                }catch (Exception e){
-                                                                        Slog.w(TAG, "Setting Brightness failed: " + e);
-                                                                }
-                                                       }
                                                 }
                                                 else
                                                 {
@@ -1757,8 +1726,6 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
             // Recalculate the position of the sliding windows and the titles.
             updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
         }
-
-        if (false) Slog.v(TAG, "updateResources");
     }
 
     //

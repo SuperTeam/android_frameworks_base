@@ -1535,13 +1535,6 @@ public interface Phone {
     void exitEmergencyCallbackMode();
 
     /**
-     * this decides if the dial number is OTA(Over the air provision) number or not
-     * @param dialStr is string representing the dialing digit(s)
-     * @return  true means the dialStr is OTA number, and false means the dialStr is not OTA number
-     */
-    boolean isOtaSpNumber(String dialStr);
-
-    /**
      * Register for notifications when CDMA call waiting comes
      *
      * @param h Handler that receives the notification message.
