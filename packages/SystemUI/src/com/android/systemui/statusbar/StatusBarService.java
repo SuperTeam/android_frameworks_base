@@ -419,7 +419,28 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         // set the inital view visibility
         setAreThereNotifications();
         mDateView.setVisibility(View.INVISIBLE);
+    }
 
+    private void updateCarrierLabel() {
+        if (mCompactCarrier) {
+            mCarrierLabelLayout.setVisibility(View.GONE);
+            // Disable compact carrier when bottom bar is enabled for now
+            // till we find a better solution (looks ugly alone at the top)
+            if (mBottomBar)
+                mCompactCarrierLayout.setVisibility(View.GONE);
+            if (mLatest.hasClearableItems())
+                mCompactClearButton.setVisibility(View.VISIBLE);
+        } else {
+            mCarrierLabelLayout.setVisibility(View.VISIBLE);
+            mCompactCarrierLayout.setVisibility(View.GONE);
+            mCompactClearButton.setVisibility(View.GONE);
+        }
+
+    }
+
+    private void updateLayout() {
+        if(mTrackingView==null || mCloseView==null || mExpandedView==null)
+            return;
         // receive broadcasts
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
