@@ -1141,7 +1141,7 @@ public class AudioService extends IAudioService.Stub {
         boolean mVolumeControlSilent = Settings.System.getInt(mContentResolver,
                 Settings.System.VOLUME_CONTROL_SILENT, 0) != 0;
         boolean vibrateInSilent = System.getInt(mContentResolver,
-                System.VIBRATE_IN_SILENT, 0) == 1;
+                System.VIBRATE_IN_SILENT, 1) == 1;
         boolean adjustVolumeIndex = true;
         int newRingerMode = mRingerMode;
 
