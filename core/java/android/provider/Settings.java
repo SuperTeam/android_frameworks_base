@@ -2649,6 +2649,7 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_CARRIER = "lockscreen_carrier";
+	/**
          * Whether to show the next calendar event
          * @hide
          */
