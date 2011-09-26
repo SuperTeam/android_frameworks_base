@@ -5031,7 +5031,7 @@ public class WebView extends AbsoluteLayout
                         || ((mActualScale <= 0.8 * mTextWrapScale));
                 if(mActualScale > mTextWrapScale) {
                     reflowNow |= Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.WEB_VIEW_PINCH_REFLOW, 0) != 0;
+                        Settings.System.WEB_VIEW_PINCH_REFLOW, 1) != 0;
                 }
                 // force zoom after mPreviewZoomOnly is set to false so that the
                 // new view size will be passed to the WebKit
