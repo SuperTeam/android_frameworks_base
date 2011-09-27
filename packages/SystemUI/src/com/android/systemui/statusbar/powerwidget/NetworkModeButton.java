@@ -114,7 +114,7 @@ public class NetworkModeButton extends PowerButton{
             }
             break;
         case Phone.NT_MODE_GLOBAL:
-            if(currentMode == CM_MODE_3GONLY) {
+            if(currentMode == CM_MODE_3GONLY || currentMode == CM_MODE_BOTH) {
                 intent.putExtra(EXTRA_NETWORK_MODE, Phone.NT_MODE_GSM_ONLY);
                 CURRENT_INTERNAL_STATE = STATE_TURNING_OFF;
                 INTENDED_NETWORK_MODE = Phone.NT_MODE_GSM_ONLY;
