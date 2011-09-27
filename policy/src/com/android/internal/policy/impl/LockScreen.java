@@ -127,7 +127,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
 
     // are we showing battery information?
     private boolean mShowingBatteryInfo = false;
-    
+
     // last known plugged in state
     private boolean mPluggedIn = false;
 

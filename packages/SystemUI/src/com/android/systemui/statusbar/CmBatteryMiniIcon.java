@@ -301,4 +301,3 @@ public class CmBatteryMiniIcon extends ImageView {
         mMatrix.postScale(mWidthPx, scaleFactor);
     }
 }
-

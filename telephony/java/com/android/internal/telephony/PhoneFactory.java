@@ -166,10 +166,10 @@ public class PhoneFactory {
             return Phone.PHONE_TYPE_GSM;
 
         case RILConstants.NETWORK_MODE_GLOBAL:
-            //return Phone.PHONE_TYPE_CDMA;
+             //return Phone.PHONE_TYPE_CDMA;
             return Phone.PHONE_TYPE_GSM;
         default:
-            //return Phone.PHONE_TYPE_CDMA;
+	    //return Phone.PHONE_TYPE_CDMA;
             return Phone.PHONE_TYPE_GSM;
         }
     }
