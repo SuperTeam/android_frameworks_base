@@ -160,7 +160,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
             Settings.System.MENU_UNLOCK_SCREEN, 0) == 1);
 
     private boolean mLockAlwaysBattery = (Settings.System.getInt(mContext.getContentResolver(),
-            Settings.System.LOCKSCREEN_ALWAYS_BATTERY, 0) == 1);
+            Settings.System.LOCKSCREEN_ALWAYS_BATTERY, 1) == 1);
 
     private boolean mLockCalendarAlarm = (Settings.System.getInt(mContext.getContentResolver(),
             Settings.System.LOCKSCREEN_CALENDAR_ALARM, 0) == 1);
@@ -216,7 +216,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
             Settings.System.LOCKSCREEN_CUSTOM_ICON_STYLE, 1);
 
     private int mWidgetLayout = Settings.System.getInt(mContext.getContentResolver(),
-            Settings.System.LOCKSCREEN_WIDGETS_LAYOUT, 0);
+            Settings.System.LOCKSCREEN_WIDGETS_LAYOUT, 2);
 
     private boolean mRotaryUnlockDown = (Settings.System.getInt(mContext.getContentResolver(),
             Settings.System.LOCKSCREEN_ROTARY_UNLOCK_DOWN, 0) == 1);
