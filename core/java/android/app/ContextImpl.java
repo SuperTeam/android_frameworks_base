@@ -2041,6 +2041,7 @@ class ContextImpl extends Context {
             }
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public List<ApplicationInfo> getInstalledApplications(int flags) {
             try {

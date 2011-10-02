@@ -114,16 +114,17 @@ public class NetworkModeButton extends PowerButton{
             }
             break;
         case Phone.NT_MODE_GLOBAL:
-            if(currentMode == CM_MODE_3GONLY) {
-            intent.putExtra(EXTRA_NETWORK_MODE, Phone.NT_MODE_GSM_ONLY);
-            CURRENT_INTERNAL_STATE = STATE_TURNING_OFF;
-            INTENDED_NETWORK_MODE=Phone.NT_MODE_GSM_ONLY;
+            if(currentMode == CM_MODE_3GONLY || currentMode == CM_MODE_BOTH) {
+                intent.putExtra(EXTRA_NETWORK_MODE, Phone.NT_MODE_GSM_ONLY);
+                CURRENT_INTERNAL_STATE = STATE_TURNING_OFF;
+                INTENDED_NETWORK_MODE = Phone.NT_MODE_GSM_ONLY;
             } else {
-                intent.putExtra(EXTRA_NETWORK_MODE, Phone.NT_MODE_WCDMA_ONLY);
+                intent.putExtra(EXTRA_NETWORK_MODE, Phone.NT_MODE_WCDMA_PREF);
                 CURRENT_INTERNAL_STATE = STATE_TURNING_ON;
-                INTENDED_NETWORK_MODE = Phone.NT_MODE_WCDMA_ONLY;
-	    }
+                INTENDED_NETWORK_MODE = Phone.NT_MODE_WCDMA_PREF;
+           }
             break;
+
         }
 
         NETWORK_MODE = NETWORK_MODE_UNKNOWN;
@@ -210,6 +211,6 @@ public class NetworkModeButton extends PowerButton{
     private static int getCurrentCMMode(Context context) {
         return Settings.System.getInt(context.getContentResolver(),
                 Settings.System.EXPANDED_NETWORK_MODE,
-                CM_MODE_3GONLY);
+                CM_MODE_3G2G);
     }
 }

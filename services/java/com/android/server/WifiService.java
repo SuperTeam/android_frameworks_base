@@ -118,11 +118,6 @@ public class WifiService extends IWifiManager.Stub {
     private AlarmManager mAlarmManager;
     private PendingIntent mIdleIntent;
     private static final int IDLE_REQUEST = 0;
- // tolemac begin
-    private PendingIntent mReconnectWifiIntent;
-    private static final int RECONNECT_REQUEST = 0;
-// tolemac end
-    
     private boolean mScreenOff;
     private boolean mDeviceIdle;
     private int mPluggedType;
@@ -161,11 +156,6 @@ public class WifiService extends IWifiManager.Stub {
      * re-establishing a connection to the mobile data network.
      */
     private static final long DEFAULT_IDLE_MILLIS = 15 * 60 * 1000; /* 15 minutes */
-    
-// tolemac begin
-    private static final long RECONNECT_MILLIS = 90 * 60 * 1000; /* 90 minutos */
-    private static final long RECONNECT_DURATION_MILLIS = 2 * 60 * 1000; /* 2 minutes */
-// tolemac end    
 
     private static final String WAKELOCK_TAG = "*wifi*";
 
@@ -241,10 +231,6 @@ public class WifiService extends IWifiManager.Stub {
 
     private static final String ACTION_DEVICE_IDLE =
             "com.android.server.WifiManager.action.DEVICE_IDLE";
-    
-    private static final String ACTION_RECONNECT_WIFI =
-        "com.android.server.WifiManager.action.ACTION_RECONNECT_WIFI";
-    
 
     private static final String WIFIAP_CONFIG_FILE = Environment.getDataDirectory() +
             "/misc/wifi/softap.conf";
@@ -284,11 +270,6 @@ public class WifiService extends IWifiManager.Stub {
         Intent idleIntent = new Intent(ACTION_DEVICE_IDLE, null);
         mIdleIntent = PendingIntent.getBroadcast(mContext, IDLE_REQUEST, idleIntent, 0);
 
-        // tolemac begin
-        Intent reconnectWifi = new Intent(ACTION_RECONNECT_WIFI, null);
-        mReconnectWifiIntent = PendingIntent.getBroadcast(mContext, RECONNECT_REQUEST, reconnectWifi, 0);
-        // tolemac end
-        
         PowerManager powerManager = (PowerManager)mContext.getSystemService(Context.POWER_SERVICE);
         sWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG);
         sDriverStopWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG);
@@ -1854,10 +1835,6 @@ public class WifiService extends IWifiManager.Stub {
                     Slog.d(TAG, "ACTION_SCREEN_ON");
                 }
                 mAlarmManager.cancel(mIdleIntent);
-// tolemac begin
-                mAlarmManager.cancel(mReconnectWifiIntent);
-// tolemac end
-                
                 mDeviceIdle = false;
                 mScreenOff = false;
                 // Once the screen is on, we are not keeping WIFI running
@@ -1913,40 +1890,7 @@ public class WifiService extends IWifiManager.Stub {
                     Slog.d(TAG, "got ACTION_DEVICE_IDLE");
                 }
                 mDeviceIdle = true;
-		sendReportWorkSourceMessage();
-                
-// tolemaC begin
-                // Cuando viene el idle hacemos que en el tiempo RECONNECT_MILLIS se reciba el mensaje de reconexion.
-                long triggerTime = System.currentTimeMillis() + RECONNECT_MILLIS;
-                if (DBG) {
-                    Slog.d(TAG, "tolemaC - setting ACTION_RECONNECT_WIFI timer for " + RECONNECT_MILLIS + "ms");
-                }
-                mAlarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, mReconnectWifiIntent);
-
-            } else if (action.equals(ACTION_RECONNECT_WIFI)) { // este intent se recibe cuando hay que reconectar.
-
-                if (DBG) {
-                    Slog.d(TAG, "ACTION_RECONNECT_WIFI");
-                }
-                mDeviceIdle = false;
-                reportStartWorkSource();
-                mWifiStateTracker.enableRssiPolling(true);
-                /* DHCP or other temporary failures in the past can prevent
-                 * a disabled network from being connected to, enable on screen on
-                 */
-                if (mWifiStateTracker.isAnyNetworkDisabled()) {
-                    sendEnableNetworksMessage();
-                }
-
-                // Ahora hacemos que en el tiempo RECONNECT_DURATION_MILLIS se reciba de nuevo el IDLE para que se desactive el wifi.
-                long triggerTime = System.currentTimeMillis() + idleMillis;
-                if (DBG) {
-                    Slog.d(TAG, "setting ACTION_DEVICE_IDLE timer for " + RECONNECT_DURATION_MILLIS
-                            + "ms");
-                }
-                mAlarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, mIdleIntent);
-// tolemaC end
-                
+                sendReportWorkSourceMessage();
             } else if (action.equals(Intent.ACTION_BATTERY_CHANGED)) {
                 /*
                  * Set a timer to put Wi-Fi to sleep, but only if the screen is off
@@ -2147,9 +2091,6 @@ public class WifiService extends IWifiManager.Stub {
         intentFilter.addAction(Intent.ACTION_BATTERY_CHANGED);
         intentFilter.addAction(ACTION_DEVICE_IDLE);
         intentFilter.addAction(BluetoothA2dp.ACTION_SINK_STATE_CHANGED);
-// tolemac begin
-        intentFilter.addAction(ACTION_RECONNECT_WIFI);
-// tolemac end
         mContext.registerReceiver(mReceiver, intentFilter);
     }
 

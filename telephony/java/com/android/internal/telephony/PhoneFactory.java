@@ -116,9 +116,15 @@ public class PhoneFactory {
                 {
                     Log.i(LOG_TAG, "Using Samsung RIL");
                     sCommandsInterface = new SamsungRIL(context, networkMode, cdmaSubscription);
+                } else if ("htc".equals(sRILClassname)) {
+                    Log.i(LOG_TAG, "Using HTC RIL");
+                    sCommandsInterface = new HTCRIL(context, networkMode, cdmaSubscription);
                 } else if("lgestar".equals(sRILClassname)) {
                     Log.i(LOG_TAG, "Using LGE Star RIL");
                     sCommandsInterface = new LGEStarRIL(context, networkMode, cdmaSubscription);
+                } else if ("semc".equals(sRILClassname)) {
+                    Log.i(LOG_TAG, "Using Semc RIL");
+                    sCommandsInterface = new SemcRIL(context, networkMode, cdmaSubscription);
                 } else {
                     sCommandsInterface = new RIL(context, networkMode, cdmaSubscription);
                 }
@@ -160,10 +166,10 @@ public class PhoneFactory {
             return Phone.PHONE_TYPE_GSM;
 
         case RILConstants.NETWORK_MODE_GLOBAL:
-            //return Phone.PHONE_TYPE_CDMA;
+             //return Phone.PHONE_TYPE_CDMA;
             return Phone.PHONE_TYPE_GSM;
         default:
-            //return Phone.PHONE_TYPE_CDMA;
+	    //return Phone.PHONE_TYPE_CDMA;
             return Phone.PHONE_TYPE_GSM;
         }
     }
