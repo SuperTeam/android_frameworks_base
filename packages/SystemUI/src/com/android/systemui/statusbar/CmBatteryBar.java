@@ -228,7 +228,7 @@ public class CmBatteryBar extends ProgressBar {
     private void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
         mShowCmBatteryBar = (Settings.System.getInt(resolver,
-                Settings.System.STATUS_BAR_CM_BATTERY, 0) == 2);
+                Settings.System.STATUS_BAR_CM_BATTERY, 2) == 2);
         if (mShowCmBatteryBar) {
             setVisibility(VISIBLE);
         } else {

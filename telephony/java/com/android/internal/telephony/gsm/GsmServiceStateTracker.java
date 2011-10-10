@@ -495,13 +495,11 @@ final class GsmServiceStateTracker extends ServiceStateTracker {
                 if (ar.exception == null) {
                     mPreferredNetworkType = ((int[])ar.result)[0];
                 } else {
-                  //  mPreferredNetworkType = RILConstants.NETWORK_MODE_GLOBAL;
-                    mPreferredNetworkType = RILConstants.NETWORK_MODE_GSM_UMTS;
+                    mPreferredNetworkType = RILConstants.NETWORK_MODE_GLOBAL;
                 }
 
                 message = obtainMessage(EVENT_SET_PREFERRED_NETWORK_TYPE, ar.userObj);
-               // int toggledNetworkType = RILConstants.NETWORK_MODE_GLOBAL;
-                int toggledNetworkType = RILConstants.NETWORK_MODE_GSM_UMTS;
+                int toggledNetworkType = RILConstants.NETWORK_MODE_GLOBAL;
 
                 cm.setPreferredNetworkType(toggledNetworkType, message);
                 break;
