@@ -948,12 +948,6 @@
     <string name="media_shared" product="default">"Karta SD sa momentálne používa počítačom."</string>
     <string name="media_unknown_state">"Neznámy stav externého média."</string>
     <string name="app_killed_message">Aplikácia ukončená</string>
-    <string name="phone_goggles_problem_count">Problém #%1$d: </string>
-    <string name="phone_goggles_description">Vyriešte %1$d nasledujúce matematické úlohy za menaj ako %2$d sekúnd pre pokračovanie Vašej komunikácie.</string>
-    <plurals name="phone_goggles_countdown">
-        <item quantity="one">%d zostáva sekúnd</item>
-        <item quantity="other">%d zostáva sekúnd</item>
-    </plurals>
     <string name="permlab_revokePermissions">Umožňuje zobraziť a upraviť odmietnuté povolenia. Nie pre normálne aplikácie.</string>
     <string name="permdesc_revokePermissions">Umožňuje zapisovať a čítať odmietnuté povolenia. Nie pre normálne aplikácie.</string>
 
