@@ -156,6 +156,9 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
     private boolean mTrackballUnlockScreen = (Settings.System.getInt(mContext.getContentResolver(),
             Settings.System.TRACKBALL_UNLOCK_SCREEN, 0) == 1);
 
+    private boolean mSliderUnlockScreen = (Settings.System.getInt(mContext.getContentResolver(),
+            Settings.System.SLIDER_UNLOCK_SCREEN, 0) == 1);
+
     private boolean mMenuUnlockScreen = (Settings.System.getInt(mContext.getContentResolver(),
             Settings.System.MENU_UNLOCK_SCREEN, 0) == 1);
 
@@ -817,9 +820,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
         if (grabbedState != SlidingTab.OnTriggerListener.NO_HANDLE) {
             mGestureOverlay.cancelGesture();
             mCallback.pokeWakelock();
-        }
-
-        if (mUseRingLockscreen) {
+        } else if (mUseRingLockscreen && mCallback != null) {
             mCallback.pokeWakelock();
         }
     }
@@ -1218,14 +1219,17 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
 
     void updateConfiguration() {
         Configuration newConfig = getResources().getConfiguration();
-        if (newConfig.orientation != mCreationOrientation) {
-            mCallback.recreateMe(newConfig);
-        } else if (newConfig.hardKeyboardHidden != mKeyboardHidden) {
+        if (newConfig.hardKeyboardHidden != mKeyboardHidden) {
             mKeyboardHidden = newConfig.hardKeyboardHidden;
             final boolean isKeyboardOpen = mKeyboardHidden == Configuration.HARDKEYBOARDHIDDEN_NO;
-            if (mUpdateMonitor.isKeyguardBypassEnabled() && isKeyboardOpen) {
+            if (mSliderUnlockScreen && mUpdateMonitor.isKeyguardBypassEnabled() 
+                    && isKeyboardOpen && !mGestureActive) {
                 mCallback.goToUnlockScreen();
+                return;
             }
+        }
+        if (newConfig.orientation != mCreationOrientation) {
+            mCallback.recreateMe(newConfig);
         }
     }
 
