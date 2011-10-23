@@ -1131,6 +1131,15 @@ public class WifiService extends IWifiManager.Stub {
 
         for (WifiConfiguration.EnterpriseField field :
                 config.enterpriseFields) {
+            /*
+             * Skip reading the password field, as the actual value isn't returned
+             * anyway, and the returned '*' might cause confusion when saving the
+             * config again, as '*' might actually be a valid password.
+             */
+            if (field == config.password) {
+                continue;
+            }
+
             value = mWifiStateTracker.getNetworkVariable(netId,
                     field.varName());
             if (!TextUtils.isEmpty(value)) {
@@ -2009,8 +2018,12 @@ public class WifiService extends IWifiManager.Stub {
         synchronized (mWifiStateTracker) {
             mTmpWorkSource.clear();
             if (mDeviceIdle) {
-                for (int i=0; i<mLocks.mList.size(); i++) {
-                    mTmpWorkSource.add(mLocks.mList.get(i).mWorkSource);
+                try {
+                    for (int i=0; i<mLocks.mList.size(); i++) {
+                        mTmpWorkSource.add(mLocks.mList.get(i).mWorkSource);
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    //Oh well, it's gone
                 }
             }
             mWifiStateTracker.updateBatteryWorkSourceLocked(mTmpWorkSource);
