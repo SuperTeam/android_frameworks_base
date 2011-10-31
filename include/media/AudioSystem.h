@@ -276,10 +276,6 @@ public:
         DEVICE_OUT_BLUETOOTH_A2DP_HEADPHONES = 0x100,
         DEVICE_OUT_BLUETOOTH_A2DP_SPEAKER = 0x200,
         DEVICE_OUT_AUX_DIGITAL = 0x400,
-<<<<<<< HEAD
-        DEVICE_OUT_HDMI = 0x20000,
-=======
->>>>>>> Updated OMAP support
 #ifdef HAVE_FM_RADIO
         DEVICE_OUT_FM = 0x800,
         DEVICE_OUT_FM_SPEAKER = 0x1000,
