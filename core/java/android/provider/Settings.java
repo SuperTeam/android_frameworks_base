@@ -2255,14 +2255,16 @@ public final class Settings {
         public static final String STATUS_BAR_AM_PM = "status_bar_am_pm";
 
         /**
-         * Display style of the status bar battery information
-         * 0: Display the stock battery information
-         * 1: Display cm battery percentage implementation / dont show stock icon
-         * 2: Hide the battery information
+         * Whether to show the stock battery icon, CM battery percentage
+         * implementation, or status bar battery
+         * of the stock battery icon
+         * 0: show stock icon
+         * 1: show cm battery
+         * 2: show status bar battery
          * default: 0
          * @hide
          */
-        public static final String STATUS_BAR_BATTERY = "status_bar_battery";
+        public static final String STATUS_BAR_CM_BATTERY = "status_bar_cm_battery";
 
         /**
          * What color for the status bar battery style
