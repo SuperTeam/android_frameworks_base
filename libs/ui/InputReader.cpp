@@ -3734,16 +3734,6 @@ void MultiTouchInputMapper::process(const RawEvent* rawEvent) {
         Accumulator::Pointer* pointer = & mAccumulator.pointers[pointerIndex];
 
         switch (rawEvent->scanCode) {
-#ifdef GTP1000_TS
-        case ABS_MT_POSITION_Y:
-            pointer->fields |= Accumulator::FIELD_ABS_MT_POSITION_X;
-            pointer->absMTPositionX = rawEvent->value;
-            break;
-        case ABS_MT_POSITION_X:
-            pointer->fields |= Accumulator::FIELD_ABS_MT_POSITION_Y;
-            pointer->absMTPositionY = 1023-rawEvent->value;
-            break;
-#else
         case ABS_MT_POSITION_X:
             pointer->fields |= Accumulator::FIELD_ABS_MT_POSITION_X;
             pointer->absMTPositionX = rawEvent->value;
@@ -3752,7 +3742,6 @@ void MultiTouchInputMapper::process(const RawEvent* rawEvent) {
             pointer->fields |= Accumulator::FIELD_ABS_MT_POSITION_Y;
             pointer->absMTPositionY = rawEvent->value;
             break;
-#endif
         case ABS_MT_TOUCH_MAJOR:
             pointer->fields |= Accumulator::FIELD_ABS_MT_TOUCH_MAJOR;
             pointer->absMTTouchMajor = rawEvent->value;
