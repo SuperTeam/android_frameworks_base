@@ -1,10 +1,6 @@
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-ifeq ($(BOARD_HAVE_FM_RADIO),true)
-  LOCAL_CFLAGS += -DHAVE_FM_RADIO
-endif
-
 LOCAL_SRC_FILES:= \
     AudioTrack.cpp \
     IAudioFlinger.cpp \
@@ -49,6 +45,10 @@ endif
 
 ifneq ($(TARGET_SIMULATOR),true)
 LOCAL_SHARED_LIBRARIES += libdl
+endif
+
+ifeq ($(BOARD_USE_KINETO_COMPATIBILITY),true)
+LOCAL_CFLAGS += -DUSE_KINETO_COMPATIBILITY
 endif
 
 LOCAL_C_INCLUDES := \

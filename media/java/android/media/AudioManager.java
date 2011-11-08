@@ -22,7 +22,6 @@ import android.app.ProfileGroup;
 import android.app.ProfileManager;
 import android.content.ComponentName;
 import android.content.Context;
-import android.database.ContentObserver;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -32,9 +31,7 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.provider.Settings;
 import android.util.Log;
-import android.view.KeyEvent;
 
-import java.util.Iterator;
 import java.util.HashMap;
 
 /**
