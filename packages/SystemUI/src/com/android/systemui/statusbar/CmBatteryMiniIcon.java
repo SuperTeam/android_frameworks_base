@@ -271,13 +271,13 @@ public class CmBatteryMiniIcon extends ImageView {
         ContentResolver resolver = mContext.getContentResolver();
 
         mShowCmBattery = (Settings.System
-                .getInt(resolver, Settings.System.STATUS_BAR_CM_BATTERY, 0) == 1);
+               .getInt(resolver, Settings.System.STATUS_BAR_CM_BATTERY, 0) == 1);
 
         if (mShowCmBattery)
             setVisibility(View.VISIBLE);
         else
             setVisibility(View.GONE);
-    }
+        }
 
     // should be toggled to private (or inlined at constructor), once StatusBarService.updateResources properly handles theme change
     public void updateIconCache() {

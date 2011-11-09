@@ -2656,6 +2656,12 @@ public final class Settings {
         public static final String QUIET_HOURS_MUTE = "quiet_hours_mute";
 
         /**
+         * Whether to disable haptic feedback during quiet hours.
+         * @hide
+         */
+        public static final String QUIET_HOURS_HAPTIC = "quiet_hours_haptic";
+
+        /**
          * Whether to remove the vibration from outgoing notifications during quiet hours.
          * @hide
          */
@@ -2683,6 +2689,18 @@ public final class Settings {
          * @hide
          */
         public static final String LOCKSCREEN_CALENDAR_ALARM = "lockscreen_calendar_alarm";
+
+        /**
+         * Whether to show the next calendar event's location
+         * @hide
+         */
+        public static final String LOCKSCREEN_CALENDAR_SHOW_LOCATION = "lockscreen_calendar_show_location";
+
+        /**
+         * Whether to show the next calendar event's description
+         * @hide
+         */
+        public static final String LOCKSCREEN_CALENDAR_SHOW_DESCRIPTION = "lockscreen_calendar_show_description";
 
         /**
          * Which calendars to look for events
@@ -3576,7 +3594,8 @@ public final class Settings {
         /**
          * Whether lock pattern will vibrate as user enters (0 = false, 1 = true)
          */
-        public static final String LOCK_PATTERN_TACTILE_FEEDBACK_ENABLED = "lock_pattern_tactile_feedback_enabled";
+        public static final String LOCK_PATTERN_TACTILE_FEEDBACK_ENABLED =
+            "lock_pattern_tactile_feedback_enabled";
 
         /**
          * LOCK_DOTS_VISIBLE
@@ -3707,7 +3726,8 @@ public final class Settings {
         /**
          * List of the enabled accessibility providers.
          */
-        public static final String ENABLED_ACCESSIBILITY_SERVICES = "enabled_accessibility_services";
+        public static final String ENABLED_ACCESSIBILITY_SERVICES =
+            "enabled_accessibility_services";
 
         /**
          * Setting to always use the default text-to-speech settings regardless
@@ -3761,20 +3781,23 @@ public final class Settings {
          * show the notification, we will not show it again for
          * {@link android.provider.Settings.Secure#WIFI_NETWORKS_AVAILABLE_REPEAT_DELAY} time.
          */
-        public static final String WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON = "wifi_networks_available_notification_on";
+        public static final String WIFI_NETWORKS_AVAILABLE_NOTIFICATION_ON =
+                "wifi_networks_available_notification_on";
 
         /**
          * Delay (in seconds) before repeating the Wi-Fi networks available notification.
          * Connecting to a network will reset the timer.
          */
-        public static final String WIFI_NETWORKS_AVAILABLE_REPEAT_DELAY = "wifi_networks_available_repeat_delay";
+        public static final String WIFI_NETWORKS_AVAILABLE_REPEAT_DELAY =
+                "wifi_networks_available_repeat_delay";
 
         /**
          * Whether to nofity the user of WiMAX network.
          * If WiMAX is connected or disconnected, we will put this notification up.
          * @hide
          */
-        public static final String WIMAX_NETWORKS_AVAILABLE_NOTIFICATION_ON = "wimax_networks_available_notification_on";
+        public static final String WIMAX_NETWORKS_AVAILABLE_NOTIFICATION_ON =
+                "wimax_networks_available_notification_on";
 
         /**
          * The number of radio channels that are allowed in the local
@@ -3807,7 +3830,8 @@ public final class Settings {
          * The acceptable packet loss percentage (range 0 - 100) before trying
          * another AP on the same network.
          */
-        public static final String WIFI_WATCHDOG_ACCEPTABLE_PACKET_LOSS_PERCENTAGE = "wifi_watchdog_acceptable_packet_loss_percentage";
+        public static final String WIFI_WATCHDOG_ACCEPTABLE_PACKET_LOSS_PERCENTAGE =
+                "wifi_watchdog_acceptable_packet_loss_percentage";
 
         /**
          * The number of access points required for a network in order for the
@@ -3818,18 +3842,21 @@ public final class Settings {
         /**
          * The delay between background checks.
          */
-        public static final String WIFI_WATCHDOG_BACKGROUND_CHECK_DELAY_MS = "wifi_watchdog_background_check_delay_ms";
+        public static final String WIFI_WATCHDOG_BACKGROUND_CHECK_DELAY_MS =
+                "wifi_watchdog_background_check_delay_ms";
 
         /**
          * Whether the Wi-Fi watchdog is enabled for background checking even
          * after it thinks the user has connected to a good access point.
          */
-        public static final String WIFI_WATCHDOG_BACKGROUND_CHECK_ENABLED = "wifi_watchdog_background_check_enabled";
+        public static final String WIFI_WATCHDOG_BACKGROUND_CHECK_ENABLED =
+                "wifi_watchdog_background_check_enabled";
 
         /**
          * The timeout for a background ping
          */
-        public static final String WIFI_WATCHDOG_BACKGROUND_CHECK_TIMEOUT_MS =  "wifi_watchdog_background_check_timeout_ms";
+        public static final String WIFI_WATCHDOG_BACKGROUND_CHECK_TIMEOUT_MS =
+                "wifi_watchdog_background_check_timeout_ms";
 
         /**
          * The number of initial pings to perform that *may* be ignored if they
@@ -3837,7 +3864,8 @@ public final class Settings {
          * calculation. For example, one network always seemed to time out for
          * the first couple pings, so this is set to 3 by default.
          */
-        public static final String WIFI_WATCHDOG_INITIAL_IGNORED_PING_COUNT = "wifi_watchdog_initial_ignored_ping_count";
+        public static final String WIFI_WATCHDOG_INITIAL_IGNORED_PING_COUNT =
+            "wifi_watchdog_initial_ignored_ping_count";
 
         /**
          * The maximum number of access points (per network) to attempt to test.
@@ -3883,7 +3911,8 @@ public final class Settings {
          * Maximum amount of time in milliseconds to hold a wakelock while waiting for mobile
          * data connectivity to be established after a disconnect from Wi-Fi.
          */
-        public static final String WIFI_MOBILE_DATA_TRANSITION_WAKELOCK_TIMEOUT_MS = "wifi_mobile_data_transition_wakelock_timeout_ms";
+        public static final String WIFI_MOBILE_DATA_TRANSITION_WAKELOCK_TIMEOUT_MS =
+            "wifi_mobile_data_transition_wakelock_timeout_ms";
 
         /**
          * Whether the Wimax should be on.  Only the WiMAX service should touch this.
@@ -3901,7 +3930,8 @@ public final class Settings {
          * Origins for which browsers should allow geolocation by default.
          * The value is a space-separated list of origins.
          */
-        public static final String ALLOWED_GEOLOCATION_ORIGINS = "allowed_geolocation_origins";
+        public static final String ALLOWED_GEOLOCATION_ORIGINS
+                = "allowed_geolocation_origins";
 
         /**
          * Whether mobile data connections are allowed by the user.  See
@@ -3936,7 +3966,8 @@ public final class Settings {
          *                              0 = GSM / WCDMA preferred
          * @hide
          */
-        public static final String PREFERRED_NETWORK_MODE = "preferred_network_mode";
+        public static final String PREFERRED_NETWORK_MODE =
+                "preferred_network_mode";
 
         /**
          * The preferred TTY mode     0 = TTy Off, CDMA default
@@ -3945,7 +3976,8 @@ public final class Settings {
          *                            3 = TTY VCO
          * @hide
          */
-        public static final String PREFERRED_TTY_MODE = "preferred_tty_mode";
+        public static final String PREFERRED_TTY_MODE =
+                "preferred_tty_mode";
 
 
         /**

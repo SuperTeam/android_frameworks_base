@@ -6,10 +6,6 @@ LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
 
-ifeq ($(BOARD_HAVE_FM_RADIO),true)
-  LOCAL_CFLAGS += -DHAVE_FM_RADIO
-endif
-
 ifeq ($(AUDIO_POLICY_TEST),true)
   ENABLE_AUDIO_DUMP := true
 endif
@@ -50,10 +46,6 @@ include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
 
-ifeq ($(BOARD_HAVE_FM_RADIO),true)
-  LOCAL_CFLAGS += -DHAVE_FM_RADIO
-endif
-
 LOCAL_SRC_FILES:=               \
     AudioPolicyManagerBase.cpp
 
@@ -81,10 +73,6 @@ endif
 include $(BUILD_STATIC_LIBRARY)
 
 include $(CLEAR_VARS)
-
-ifeq ($(BOARD_HAVE_FM_RADIO),true)
-  LOCAL_CFLAGS += -DHAVE_FM_RADIO
-endif
 
 LOCAL_SRC_FILES:=               \
     AudioFlinger.cpp            \

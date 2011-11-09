@@ -35,7 +35,7 @@ public class CmBatteryText extends TextView {
     private boolean mAttached;
 
     // weather to show this battery widget or not
-    private boolean mShowCmBattery;
+   private boolean mShowCmBattery;
 
     Handler mHandler;
 
@@ -129,12 +129,12 @@ public class CmBatteryText extends TextView {
     private void updateSettings() {
         ContentResolver resolver = mContext.getContentResolver();
 
-        mShowCmBattery = (Settings.System
-                .getInt(resolver, Settings.System.STATUS_BAR_CM_BATTERY, 0) == 1);
+     mShowCmBattery = (Settings.System
+               .getInt(resolver, Settings.System.STATUS_BAR_CM_BATTERY, 0) == 1);
 
         if (mShowCmBattery)
             setVisibility(View.VISIBLE);
         else
             setVisibility(View.GONE);
-    }
+        }
 }

@@ -342,12 +342,15 @@ InputDevice* InputReader::createDevice(int32_t deviceId, const String8& name, ui
 
     // Touchscreen-like devices.
     if (classes & INPUT_DEVICE_CLASS_TOUCHSCREEN_MT) {
-#ifdef ZEUS_TOUCHPADS
+#ifdef TOUCHPAD_INPUT_DEVICE_ID
         /* According to the Sony Ericsson SDK, the jogdials should be interpreted
          * as an AINPUT_SOURCE_TOUCHPAD. According to getSources() above, a
          * touchpad is simply a device with a negative associated display id.
+         *
+         * This is also available to others who need input touchpads to be
+         * recognized as such and not as a regular touchscreen.
          */
-        if (deviceId == 0x10004) {
+        if (deviceId == TOUCHPAD_INPUT_DEVICE_ID) {
             device->addMapper(new MultiTouchInputMapper(device, -1));
         } else {
             device->addMapper(new MultiTouchInputMapper(device, associatedDisplayId));
@@ -3731,16 +3734,6 @@ void MultiTouchInputMapper::process(const RawEvent* rawEvent) {
         Accumulator::Pointer* pointer = & mAccumulator.pointers[pointerIndex];
 
         switch (rawEvent->scanCode) {
-#ifdef GTP1000_TS
-        case ABS_MT_POSITION_Y:
-            pointer->fields |= Accumulator::FIELD_ABS_MT_POSITION_X;
-            pointer->absMTPositionX = rawEvent->value;
-            break;
-        case ABS_MT_POSITION_X:
-            pointer->fields |= Accumulator::FIELD_ABS_MT_POSITION_Y;
-            pointer->absMTPositionY = 1023-rawEvent->value;
-            break;
-#else
         case ABS_MT_POSITION_X:
             pointer->fields |= Accumulator::FIELD_ABS_MT_POSITION_X;
             pointer->absMTPositionX = rawEvent->value;
@@ -3749,7 +3742,6 @@ void MultiTouchInputMapper::process(const RawEvent* rawEvent) {
             pointer->fields |= Accumulator::FIELD_ABS_MT_POSITION_Y;
             pointer->absMTPositionY = rawEvent->value;
             break;
-#endif
         case ABS_MT_TOUCH_MAJOR:
             pointer->fields |= Accumulator::FIELD_ABS_MT_TOUCH_MAJOR;
             pointer->absMTTouchMajor = rawEvent->value;
