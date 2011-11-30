@@ -283,25 +283,17 @@ void Layer::onDraw(const Region& clip) const
         glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
         glMatrixMode(GL_TEXTURE);
         glLoadMatrixf(mTextureMatrix);
-        // glMatrixMode(GL_MODELVIEW);
-        // glDisable(GL_TEXTURE_2D);
-        // glEnable(GL_TEXTURE_EXTERNAL_OES);
     } else {
         glBindTexture(GL_TEXTURE_2D, mFlinger->getProtectedTexName());
         glMatrixMode(GL_TEXTURE);
         glLoadIdentity();
-        // glMatrixMode(GL_MODELVIEW);
-        // glDisable(GL_TEXTURE_EXTERNAL_OES);
-        // glEnable(GL_TEXTURE_2D);
     }
 
     glMatrixMode(GL_MODELVIEW);
-    // glLoadIdentity();
     glEnable(GL_TEXTURE_2D);
 
     drawWithOpenGL(clip);
 
-    // glDisable(GL_TEXTURE_EXTERNAL_OES);
     glDisable(GL_TEXTURE_2D);
 }
 
