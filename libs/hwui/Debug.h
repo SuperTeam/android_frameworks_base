@@ -18,7 +18,7 @@
 #define ANDROID_HWUI_DEBUG_H
 
 // Turn on to check for OpenGL errors on each frame
-#define DEBUG_OPENGL 1
+#define DEBUG_OPENGL 0
 
 // Turn on to display informations about the GPU
 #define DEBUG_EXTENSIONS 0
@@ -30,7 +30,7 @@
 #define DEBUG_MEMORY_USAGE 0
 
 // Turn on to enable debugging of cache flushes
-#define DEBUG_CACHE_FLUSH 1
+#define DEBUG_CACHE_FLUSH 0
 
 // Turn on to enable layers debugging when rendered as regions
 #define DEBUG_LAYERS_AS_REGIONS 0
