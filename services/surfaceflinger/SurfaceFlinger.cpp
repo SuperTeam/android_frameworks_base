@@ -1040,7 +1040,6 @@ void SurfaceFlinger::debugFlashRegions()
         composeSurfaces(repaint);
     }
 
-    glDisable(GL_TEXTURE_EXTERNAL_OES);
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
     glDisable(GL_SCISSOR_TEST);
@@ -1104,7 +1103,6 @@ void SurfaceFlinger::drawWormhole() const
         glTexCoordPointer(2, GL_SHORT, 0, tcoords);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-        glDisable(GL_TEXTURE_EXTERNAL_OES);
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, mWormholeTexName);
         glTexEnvx(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -1864,7 +1862,6 @@ status_t SurfaceFlinger::renderScreenToTextureLocked(DisplayID dpy,
             GL_COLOR_ATTACHMENT0_OES, GL_TEXTURE_2D, tname, 0);
 
     // redraw the screen entirely...
-    glDisable(GL_TEXTURE_EXTERNAL_OES);
     glDisable(GL_TEXTURE_2D);
     glClearColor(0,0,0,1);
     glClear(GL_COLOR_BUFFER_BIT);
