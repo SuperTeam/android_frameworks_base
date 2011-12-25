@@ -947,12 +947,6 @@
     <string name="media_shared" product="default" msgid="5706130568133540435">"Karta SD je momentálně používána počítačem."</string>
     <string name="media_unknown_state" msgid="729192782197290385">"Neznámý stav externího média."</string>
     <string name="app_killed_message">"Aplikace ukončena"</string>
-    <string name="phone_goggles_problem_count">"Úloha #%1$d: "</string>
-    <string name="phone_goggles_description">"Pro pokračování prosím vyřešte následujících %1$d matematických úloh v méně jak %2$d sekund."</string>
-    <plurals name="phone_goggles_countdown">
-        <item quantity="one">"%d sekunda"</item>
-        <item quantity="other">"%d sekund"</item>
-    </plurals>
     <string name="permlab_revokePermissions">"Umožní zobrazit a změnit nepovolená oprávnění. Nelze využít v normální aplikaci."</string>
     <string name="permdesc_revokePermissions">"Umožní číst a zapisovat nepovolená oprávnění. Nelze využít v normální aplikací."</string>
 </resources>
