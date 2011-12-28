@@ -262,6 +262,24 @@ static jboolean android_location_GpsLocationProvider_is_supported(JNIEnv* env, j
 
 static jboolean android_location_GpsLocationProvider_init(JNIEnv* env, jobject obj)
 {
+#ifdef HAVE_GPS_AR1520
+	if (!sGpsInterface)
+		sGpsInterface = GetGpsInterface(env, obj);
+	if (!sGpsInterface || sGpsInterface->init(&sGpsCallbacks) != 0)
+		return false;
+	if (!sAGpsInterface)
+		sAGpsInterface = (const AGpsInterface*)sGpsInterface->get_extension(AGPS_INTERFACE);
+	if (sAGpsInterface)
+		sAGpsInterface->init(&sAGpsCallbacks);
+	if (!sGpsNiInterface)
+		sGpsNiInterface = (const GpsNiInterface*)sGpsInterface->get_extension(GPS_NI_INTERFACE);
+	if (sGpsNiInterface)
+		sGpsNiInterface->init(&sGpsNiCallbacks);
+	if (!sGpsDebugInterface)
+	   sGpsDebugInterface = (const GpsDebugInterface*)sGpsInterface->get_extension(GPS_DEBUG_INTERFACE);
+	return true;
+#else
+
     // this must be set before calling into the HAL library
     if (!mCallbacksObj)
         mCallbacksObj = env->NewGlobalRef(obj);
@@ -282,6 +300,7 @@ static jboolean android_location_GpsLocationProvider_init(JNIEnv* env, jobject o
         sAGpsRilInterface->init(&sAGpsRilCallbacks);
 
     return true;
+#endif
 }
 
 static void android_location_GpsLocationProvider_cleanup(JNIEnv* env, jobject obj)

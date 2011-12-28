@@ -39,6 +39,10 @@ ifeq ($(WITH_MALLOC_LEAK_CHECK),true)
 	LOCAL_CFLAGS += -DMALLOC_LEAK_CHECK
 endif
 
+ifeq ($(BOARD_GPS_MODULE), AR1520)
+	LOCAL_CFLAGS += -DHAVE_GPS_AR1520
+endif
+
 LOCAL_MODULE:= libandroid_servers
 
 include $(BUILD_SHARED_LIBRARY)
