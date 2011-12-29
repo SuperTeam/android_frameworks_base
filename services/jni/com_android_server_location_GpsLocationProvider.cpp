@@ -23,7 +23,6 @@
 #include "hardware/hardware.h"
 #include "hardware/gps.h"
 #include "hardware_legacy/power.h"
-#include "utils/Log.h"
 #include "utils/misc.h"
 #include "android_runtime/AndroidRuntime.h"
 
@@ -106,7 +105,6 @@ static void nmea_callback(GpsUtcTime timestamp, const char* nmea, int length)
 
 static void set_capabilities_callback(uint32_t capabilities)
 {
-    LOGD("set_capabilities_callback: %ld\n", capabilities);
     JNIEnv* env = AndroidRuntime::getJNIEnv();
     env->CallVoidMethod(mCallbacksObj, method_setEngineCapabilities, capabilities);
     checkAndClearExceptionFromCallback(env, __FUNCTION__);
@@ -166,7 +164,6 @@ AGpsCallbacks sAGpsCallbacks = {
 
 static void gps_ni_notify_callback(GpsNiNotification *notification)
 {
-    LOGD("gps_ni_notify_callback\n");
     JNIEnv* env = AndroidRuntime::getJNIEnv();
     jstring requestor_id = env->NewStringUTF(notification->requestor_id);
     jstring text = env->NewStringUTF(notification->text);
@@ -217,21 +214,10 @@ AGpsRilCallbacks sAGpsRilCallbacks = {
     create_thread_callback,
 };
 
-static void android_location_GpsLocationProvider_class_init_native(JNIEnv* env, jclass clazz) {
+static const GpsInterface* get_gps_interface() {
     int err;
     hw_module_t* module;
-
-    method_reportLocation = env->GetMethodID(clazz, "reportLocation", "(IDDDFFFJ)V");
-    method_reportStatus = env->GetMethodID(clazz, "reportStatus", "(I)V");
-    method_reportSvStatus = env->GetMethodID(clazz, "reportSvStatus", "()V");
-    method_reportAGpsStatus = env->GetMethodID(clazz, "reportAGpsStatus", "(II)V");
-    method_reportNmea = env->GetMethodID(clazz, "reportNmea", "(J)V");
-    method_setEngineCapabilities = env->GetMethodID(clazz, "setEngineCapabilities", "(I)V");
-    method_xtraDownloadRequest = env->GetMethodID(clazz, "xtraDownloadRequest", "()V");
-    method_reportNiNotification = env->GetMethodID(clazz, "reportNiNotification",
-            "(IIIIILjava/lang/String;Ljava/lang/String;IILjava/lang/String;)V");
-    method_requestRefLocation = env->GetMethodID(clazz,"requestRefLocation","(I)V");
-    method_requestSetID = env->GetMethodID(clazz,"requestSetID","(I)V");
+    const GpsInterface* interface = NULL;
 
     err = hw_get_module(GPS_HARDWARE_MODULE_ID, (hw_module_t const**)&module);
     if (err == 0) {
@@ -239,9 +225,84 @@ static void android_location_GpsLocationProvider_class_init_native(JNIEnv* env, 
         err = module->methods->open(module, GPS_HARDWARE_MODULE_ID, &device);
         if (err == 0) {
             gps_device_t* gps_device = (gps_device_t *)device;
-            sGpsInterface = gps_device->get_gps_interface(gps_device);
+            interface = gps_device->get_gps_interface(gps_device);
         }
     }
+
+    return interface;
+}
+
+static const GpsInterface* GetGpsInterface(JNIEnv* env, jobject obj) {
+    // this must be set before calling into the HAL library
+    if (!mCallbacksObj)
+        mCallbacksObj = env->NewGlobalRef(obj);
+
+    if (!sGpsInterface) {
+        sGpsInterface = get_gps_interface();
+        if (!sGpsInterface || sGpsInterface->init(&sGpsCallbacks) != 0) {
+            sGpsInterface = NULL;
+            return NULL;
+        }
+    }
+    return sGpsInterface;
+}
+
+static const AGpsInterface* GetAGpsInterface(JNIEnv* env, jobject obj)
+{
+    const GpsInterface* interface = GetGpsInterface(env, obj);
+    if (!interface)
+        return NULL;
+
+    if (!sAGpsInterface) {
+        sAGpsInterface = (const AGpsInterface*)interface->get_extension(AGPS_INTERFACE);
+        if (sAGpsInterface)
+            sAGpsInterface->init(&sAGpsCallbacks);
+    }
+    return sAGpsInterface;
+}
+
+static const GpsNiInterface* GetNiInterface(JNIEnv* env, jobject obj)
+{
+    const GpsInterface* interface = GetGpsInterface(env, obj);
+    if (!interface)
+        return NULL;
+
+    if (!sGpsNiInterface) {
+       sGpsNiInterface = (const GpsNiInterface*)interface->get_extension(GPS_NI_INTERFACE);
+        if (sGpsNiInterface)
+           sGpsNiInterface->init(&sGpsNiCallbacks);
+    }
+    return sGpsNiInterface;
+}
+
+static const AGpsRilInterface* GetAGpsRilInterface(JNIEnv* env, jobject obj)
+{
+    const GpsInterface* interface = GetGpsInterface(env, obj);
+    if (!interface)
+        return NULL;
+
+    if (!sAGpsRilInterface) {
+       sAGpsRilInterface = (const AGpsRilInterface*)interface->get_extension(AGPS_RIL_INTERFACE);
+        if (sAGpsRilInterface)
+            sAGpsRilInterface->init(&sAGpsRilCallbacks);
+    }
+    return sAGpsRilInterface;
+}
+
+static void android_location_GpsLocationProvider_class_init_native(JNIEnv* env, jclass clazz) {
+    method_reportLocation = env->GetMethodID(clazz, "reportLocation", "(IDDDFFFJ)V");
+    method_reportStatus = env->GetMethodID(clazz, "reportStatus", "(I)V");
+    method_reportSvStatus = env->GetMethodID(clazz, "reportSvStatus", "()V");
+    method_reportAGpsStatus = env->GetMethodID(clazz, "reportAGpsStatus", "(II)V");
+    method_reportNmea = env->GetMethodID(clazz, "reportNmea", "(J)V");
+    method_setEngineCapabilities = env->GetMethodID(clazz, "setEngineCapabilities", "(I)V");
+    method_xtraDownloadRequest = env->GetMethodID(clazz, "xtraDownloadRequest", "()V");
+    method_reportNiNotification = env->GetMethodID(clazz, "reportNiNotification", "(IIIIILjava/lang/String;Ljava/lang/String;IILjava/lang/String;)V");
+    method_requestRefLocation = env->GetMethodID(clazz,"requestRefLocation","(I)V");
+    method_requestSetID = env->GetMethodID(clazz,"requestSetID","(I)V");
+
+    sGpsInterface = get_gps_interface();
+
     if (sGpsInterface) {
         sGpsXtraInterface =
             (const GpsXtraInterface*)sGpsInterface->get_extension(GPS_XTRA_INTERFACE);
@@ -257,16 +318,23 @@ static void android_location_GpsLocationProvider_class_init_native(JNIEnv* env, 
 }
 
 static jboolean android_location_GpsLocationProvider_is_supported(JNIEnv* env, jclass clazz) {
-    return (sGpsInterface != NULL);
+	return (sGpsInterface != NULL || get_gps_interface() != NULL);
 }
 
 static jboolean android_location_GpsLocationProvider_init(JNIEnv* env, jobject obj)
 {
-#ifdef HAVE_GPS_AR1520
+    // this must be set before calling into the HAL library
+    if (!mCallbacksObj)
+        mCallbacksObj = env->NewGlobalRef(obj);
+
 	if (!sGpsInterface)
 		sGpsInterface = GetGpsInterface(env, obj);
-	if (!sGpsInterface || sGpsInterface->init(&sGpsCallbacks) != 0)
-		return false;
+
+    // fail if the main interface fails to initialize
+    if (!sGpsInterface || sGpsInterface->init(&sGpsCallbacks) != 0)
+        return false;
+
+#ifdef HAVE_GPS_AR1520
 	if (!sAGpsInterface)
 		sAGpsInterface = (const AGpsInterface*)sGpsInterface->get_extension(AGPS_INTERFACE);
 	if (sAGpsInterface)
@@ -279,14 +347,6 @@ static jboolean android_location_GpsLocationProvider_init(JNIEnv* env, jobject o
 	   sGpsDebugInterface = (const GpsDebugInterface*)sGpsInterface->get_extension(GPS_DEBUG_INTERFACE);
 	return true;
 #else
-
-    // this must be set before calling into the HAL library
-    if (!mCallbacksObj)
-        mCallbacksObj = env->NewGlobalRef(obj);
-
-    // fail if the main interface fails to initialize
-    if (!sGpsInterface || sGpsInterface->init(&sGpsCallbacks) != 0)
-        return false;
 
     // if XTRA initialization fails we will disable it by sGpsXtraInterface to null,
     // but continue to allow the rest of the GPS interface to work.
