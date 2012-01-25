@@ -1648,6 +1648,13 @@ public final class Settings {
         public static final String VOLUME_CONTROL_SILENT = "volume_contol_silent";
 
         /**
+         * Whether to lock ringer volume changes in silent mode.
+         *
+         * @hide
+         */
+        public static final String LOCK_VOLUME_KEYS = "lock_volume_keys";
+
+        /**
          * Whether notifications should vibrate during phone calls or not.
          *
          * @hide
@@ -2607,6 +2614,18 @@ public final class Settings {
          * @hide
          */
         public static final String IN_CALL_STYLE_PREF = "in_call_style_pref";
+
+        /**
+         * Sets the rotary lock style
+         * @hide
+         */
+        public static final String ROTARY_STYLE_PREF = "rotary_style_pref";
+
+        /**
+         * Sets the ringlock style
+         * @hide
+         */
+        public static final String RINGLOCK_STYLE_PREF = "ringlock_style_pref";
 
         /**
          * Pulse the Trackball with Screen On.  The value is boolean (1 or 0).
@@ -3664,6 +3683,12 @@ public final class Settings {
          * @hide
          */
         public static final String ASSISTED_GPS_ENABLED = "assisted_gps_enabled";
+        
+         /**
+         * External BT GPS device
+         * @hide
+         */
+        public static final String EXTERNAL_GPS_BT_DEVICE = "0";
 
         /**
          * The Logging ID (a unique 64-bit value) as a hex string.
@@ -5031,4 +5056,5 @@ public final class Settings {
     public static String getGTalkDeviceId(long androidId) {
         return "android-" + Long.toHexString(androidId);
     }
+    
 }

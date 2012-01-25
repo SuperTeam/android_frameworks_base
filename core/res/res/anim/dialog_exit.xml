@@ -17,8 +17,8 @@
 */
 -->
 
-<set xmlns:android="http://schemas.android.com/apk/res/android"
-        android:interpolator="@anim/linear_interpolator">
-    <translate android:fromYDelta="0%" android:toYDelta="-100%"
-           android:duration="@android:integer/config_shortAnimTime" />
+<set android:shareInterpolator="false"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <scale android:interpolator="@anim/decelerate_quint" android:duration="@integer/config_activityDefaultDur" android:pivotX="50.0%" android:pivotY="50.0%" android:fromXScale="1.0" android:toXScale="0.9" android:fromYScale="1.0" android:toYScale="0.9" />
+    <alpha android:interpolator="@anim/decelerate_cubic" android:duration="@integer/config_activityShortDur" android:fromAlpha="1.0" android:toAlpha="0.0" />
 </set>
