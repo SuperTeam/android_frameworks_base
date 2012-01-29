@@ -27,6 +27,10 @@
 #include "JNIHelp.h"
 #include "jni.h"
 #include <limits.h>
+#ifdef CUSTOM_PANEL_SIRIUS
+#include <stdlib.h>
+#include <cutils/properties.h>
+#endif
 #include <android_runtime/AndroidRuntime.h>
 #include <ui/InputReader.h>
 #include <ui/InputDispatcher.h>
@@ -38,6 +42,11 @@
 #include "../../core/jni/android_view_MotionEvent.h"
 #include "../../core/jni/android_view_InputChannel.h"
 #include "com_android_server_PowerManagerService.h"
+#ifdef CUSTOM_PANEL_SIRIUS
+namespace {
+    int32_t hwrotation;
+}
+#endif
 
 namespace android {
 
@@ -275,6 +284,11 @@ NativeInputManager::NativeInputManager(jobject callbacksObj) :
     mDisplayWidth(-1), mDisplayHeight(-1), mDisplayOrientation(ROTATION_0) {
     JNIEnv* env = jniEnv();
 
+#ifdef CUSTOM_PANEL_SIRIUS
+    char propBuf[PROPERTY_VALUE_MAX];
+    property_get("input.hwrotation", propBuf, "0");
+    hwrotation = (atoi(propBuf) / 90) % 4;
+#endif
     mCallbacksObj = env->NewGlobalRef(callbacksObj);
 
     sp<EventHub> eventHub = new EventHub();
@@ -405,6 +419,7 @@ jobject NativeInputManager::getInputChannelObjLocal(JNIEnv* env,
     }
 }
 
+#ifndef CUSTOM_PANEL_SIRIUS
 bool NativeInputManager::getDisplayInfo(int32_t displayId,
         int32_t* width, int32_t* height, int32_t* orientation) {
     bool result = false;
@@ -426,6 +441,29 @@ bool NativeInputManager::getDisplayInfo(int32_t displayId,
     }
     return result;
 }
+#else
+bool NativeInputManager::getDisplayInfo(int32_t displayId,
+        int32_t* width, int32_t* height, int32_t* orientation) {
+    bool result = false;
+    if (displayId == 0) {
+        AutoMutex _l(mDisplayLock);
+
+        if (mDisplayWidth > 0) {
+            if (width) {
+                *width = (hwrotation % 2) ? mDisplayHeight : mDisplayWidth;
+            }
+            if (height) {
+                *height = (hwrotation % 2) ? mDisplayWidth : mDisplayHeight;
+            }
+            if (orientation) {
+                *orientation = (mDisplayOrientation + hwrotation) % 4;
+            }
+            result = true;
+        }
+    }
+    return result;
+}
+#endif
 
 bool NativeInputManager::filterTouchEvents() {
     if (mFilterTouchEvents < 0) {

@@ -35,6 +35,10 @@ endif
 endif
 endif
 
+ifeq ($(BOARD_HAVE_CUSTOM_PANEL_SIRIUS),true)
+LOCAL_CFLAGS += -DCUSTOM_PANEL_SIRIUS
+endif
+
 ifeq ($(WITH_MALLOC_LEAK_CHECK),true)
 	LOCAL_CFLAGS += -DMALLOC_LEAK_CHECK
 endif

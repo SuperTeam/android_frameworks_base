@@ -1732,6 +1732,36 @@ void TouchInputMapper::parseCalibration() {
     const InputDeviceCalibration& in = getDevice()->getCalibration();
     Calibration& out = mCalibration;
 
+#ifdef CUSTOM_PANEL_SIRIUS
+    // Pointercal
+    if (! in.tryGetProperty(String8("touch.pointercal.x1"), out.pointercalX1)) {
+        out.pointercalX1 = 1.0f;
+    }
+    if (! in.tryGetProperty(String8("touch.pointercal.x2"), out.pointercalX2)) {
+        out.pointercalX2 = 0.0f;
+    }
+    if (! in.tryGetProperty(String8("touch.pointercal.x3"), out.pointercalX3)) {
+        out.pointercalX3 = 0.0f;
+    }
+    if (! in.tryGetProperty(String8("touch.pointercal.y1"), out.pointercalY1)) {
+        out.pointercalY1 = 0.0f;
+    }
+    if (! in.tryGetProperty(String8("touch.pointercal.y2"), out.pointercalY2)) {
+        out.pointercalY2 = 1.0f;
+    }
+    if (! in.tryGetProperty(String8("touch.pointercal.y3"), out.pointercalY3)) {
+        out.pointercalY3 = 0.0f;
+    }
+    if (! in.tryGetProperty(String8("touch.pointercal.scale"), out.pointercalScale)) {
+        out.pointercalScale = 1.0f;
+    }
+    out.pointercalX1 /= out.pointercalScale;
+    out.pointercalX2 /= out.pointercalScale;
+    out.pointercalX3 /= out.pointercalScale;
+    out.pointercalY1 /= out.pointercalScale;
+    out.pointercalY2 /= out.pointercalScale;
+    out.pointercalY3 /= out.pointercalScale;
+#endif
     // Touch Size
     out.touchSizeCalibration = Calibration::TOUCH_SIZE_CALIBRATION_DEFAULT;
     String8 touchSizeCalibrationString;
@@ -2372,8 +2402,26 @@ void TouchInputMapper::dispatchTouch(nsecs_t when, uint32_t policyFlags,
             const PointerData& in = touch->pointers[inIndex];
 
             // X and Y
+#ifdef CUSTOM_PANEL_SIRIUS
+            float x, y;
+            if (mCalibration.pointercalScale == 1.0f) {
+                x = float(in.x - mLocked.xOrigin) * mLocked.xScale;
+                y = float(in.y - mLocked.yOrigin) * mLocked.yScale;
+            } else {
+                // Pointercal
+                float rawx = float(in.x - mLocked.xOrigin);
+                float rawy = float(in.y - mLocked.yOrigin);
+                x = mCalibration.pointercalX1 * rawx +
+                    mCalibration.pointercalX2 * rawy +
+                    mCalibration.pointercalX3;
+                y = mCalibration.pointercalY1 * rawx +
+                    mCalibration.pointercalY2 * rawy +
+                    mCalibration.pointercalY3;
+            }
+#else
             float x = float(in.x - mLocked.xOrigin) * mLocked.xScale;
             float y = float(in.y - mLocked.yOrigin) * mLocked.yScale;
+#endif
 
             // ToolMajor and ToolMinor
             float toolMajor, toolMinor;

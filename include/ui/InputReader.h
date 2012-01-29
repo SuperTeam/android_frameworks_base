@@ -668,6 +668,16 @@ protected:
 
     // Immutable calibration parameters in parsed form.
     struct Calibration {
+#ifdef CUSTOM_PANEL_SIRIUS
+        // Pointercal
+        float pointercalX1;
+        float pointercalX2;
+        float pointercalX3;
+        float pointercalY1;
+        float pointercalY2;
+        float pointercalY3;
+        float pointercalScale;
+#endif
         // Touch Size
         enum TouchSizeCalibration {
             TOUCH_SIZE_CALIBRATION_DEFAULT,
