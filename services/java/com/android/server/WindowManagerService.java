@@ -17,6 +17,9 @@
 
 package com.android.server;
 
+import static android.view.WindowManager.MOUSE_CURSOR_NONE;
+import static android.view.WindowManager.MOUSE_CURSOR_SURFACE;
+import static android.view.WindowManager.MOUSE_CURSOR_OSD2;
 import static android.view.WindowManager.LayoutParams.FIRST_APPLICATION_WINDOW;
 import static android.view.WindowManager.LayoutParams.FIRST_SUB_WINDOW;
 import static android.view.WindowManager.LayoutParams.FLAG_BLUR_BEHIND;
@@ -31,6 +34,7 @@ import static android.view.WindowManager.LayoutParams.FLAG_SHOW_WALLPAPER;
 import static android.view.WindowManager.LayoutParams.LAST_APPLICATION_WINDOW;
 import static android.view.WindowManager.LayoutParams.LAST_SUB_WINDOW;
 import static android.view.WindowManager.LayoutParams.MEMORY_TYPE_PUSH_BUFFERS;
+import static android.view.WindowManager.LayoutParams.MEMORY_TYPE_NO_BLEND;
 import static android.view.WindowManager.LayoutParams.TYPE_APPLICATION_STARTING;
 import static android.view.WindowManager.LayoutParams.TYPE_BASE_APPLICATION;
 import static android.view.WindowManager.LayoutParams.TYPE_INPUT_METHOD;
@@ -38,6 +42,7 @@ import static android.view.WindowManager.LayoutParams.TYPE_INPUT_METHOD_DIALOG;
 import static android.view.WindowManager.LayoutParams.TYPE_WALLPAPER;
 
 import com.android.internal.app.IBatteryStats;
+import com.android.internal.graphics.OSD2Cursor;
 import com.android.internal.policy.PolicyManager;
 import com.android.internal.policy.impl.CmPhoneWindowManager;
 import com.android.internal.policy.impl.PhoneWindowManager;
@@ -65,6 +70,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.Region;
@@ -260,6 +266,29 @@ public class WindowManagerService extends IWindowManager.Stub
         }
     };
 
+#ifdef CUSTOM_PANEL_SIRIUS
+    final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+        	if(DevicePolicyManager.ACTION_DEVICE_POLICY_MANAGER_STATE_CHANGED.equals(intent.getAction())){
+				
+	            mPolicy.enableKeyguard(true);
+	            synchronized(mKeyguardTokenWatcher) {
+	                // lazily evaluate this next time we're asked to disable keyguard
+	                mAllowDisableKeyguard = ALLOW_DISABLE_UNKNOWN;
+	                mKeyguardDisabled = false;
+	            }
+			}else if (Intent.ACTION_TVOUT_EVENT.equals(intent.getAction())) {
+
+				mTVOutOn = (intent.getIntExtra(Intent.EXTRA_TVOUT_STATE,
+                    Intent.EXTRA_TVOUT_STATE_OFF) == Intent.EXTRA_TVOUT_STATE_ON);
+
+				Slog.i("WindowManagerService ", "TvOut Intent receiver, tvout status="+ mTVOutOn);
+				mInputManager.setTvOutStatus(mTVOutOn);
+			}
+        }
+    };
+#else
     final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -271,7 +300,7 @@ public class WindowManagerService extends IWindowManager.Stub
             }
         }
     };
-
+#endif
     final Context mContext;
 
     final boolean mHaveInputMethods;
@@ -387,6 +416,23 @@ public class WindowManagerService extends IWindowManager.Stub
     Watermark mWatermark;
     ScreenRotationAnimation mScreenRotationAnimation;
 
+#ifdef CUSTOM_PANEL_SIRIUS
+    //private static final int CURSOR_NONE = 0;
+    //private static final int CURSOR_GLSURFACE = 1;
+    //private static final int CURSOR_OSD2 = 2;
+    private final Object mMouseCursorLock = new Object();
+    private int mMouseCursorType;
+    private Surface mMouseSurface = null;
+    private boolean mMouseCursorShown = false;
+    private int mMlx;
+    private int mMly;
+    //private int mMlw;
+    //private int mMlh;
+
+	private final boolean mAutoHideCursor;
+	private final int mAutoHideCursorTimeout;
+#endif
+
     int mTransactionSequence = 0;
 
     final float[] mTmpFloats = new float[9];
@@ -445,6 +491,7 @@ public class WindowManagerService extends IWindowManager.Stub
     Display mDisplay;
 
     H mH = new H();
+	CursorRunable mCursorRunable = new CursorRunable();
 
     WindowState mCurrentFocus = null;
     WindowState mLastFocus = null;
@@ -488,6 +535,8 @@ public class WindowManagerService extends IWindowManager.Stub
     AppWindowToken mFocusedApp = null;
 
     PowerManagerService mPowerManager;
+	
+	private boolean mTVOutOn = false;
 
     float mWindowAnimationScale = 1.0f;
     float mTransitionAnimationScale = 1.0f;
@@ -661,10 +710,33 @@ public class WindowManagerService extends IWindowManager.Stub
         IntentFilter filter = new IntentFilter();
         filter.addAction(DevicePolicyManager.ACTION_DEVICE_POLICY_MANAGER_STATE_CHANGED);
         mContext.registerReceiver(mBroadcastReceiver, filter);
+#ifdef CUSTOM_PANEL_SIRIUS
+		filter.addAction(Intent.ACTION_TVOUT_EVENT);
+        Intent intent = mContext.registerReceiver(mBroadcastReceiver, filter);
+		
+		if (intent != null) {
+            // Retrieve current sticky tvout event broadcast.
+			mTVOutOn = (intent.getIntExtra(Intent.EXTRA_TVOUT_STATE,
+                    Intent.EXTRA_TVOUT_STATE_OFF) == Intent.EXTRA_TVOUT_STATE_ON);
+        }
+#endif
 
         mHoldingScreenWakeLock = pmc.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK,
                 "KEEP_SCREEN_ON_FLAG");
         mHoldingScreenWakeLock.setReferenceCounted(false);
+
+#ifdef CUSTOM_PANEL_SIRIUS
+        String mouseCursorTypeStr = SystemProperties.get("ro.ui.cursor");
+        if ("none".equals(mouseCursorTypeStr))
+            mMouseCursorType = MOUSE_CURSOR_NONE;
+        else if ("osd2".equals(mouseCursorTypeStr))
+            mMouseCursorType = MOUSE_CURSOR_OSD2;
+        else
+            mMouseCursorType = MOUSE_CURSOR_SURFACE;
+
+		mAutoHideCursor = SystemProperties.getBoolean("ro.ui.cursor.autohide", true);
+		mAutoHideCursorTimeout = SystemProperties.getInt("ro.ui.cursor.timeout", 10000);
+#endif
 
         mInputManager = new InputManager(context, this);
 
@@ -2349,6 +2421,30 @@ public class WindowManagerService extends IWindowManager.Stub
             if (attrs != null) {
                 flagChanges = win.mAttrs.flags ^= attrs.flags;
                 attrChanges = win.mAttrs.copyFrom(attrs);
+
+#ifdef CUSTOM_PANEL_SIRIUS
+                if ((attrChanges&WindowManager.LayoutParams.MEMORY_TYPE_CHANGED) != 0) {
+                    if ((attrs.memoryType == MEMORY_TYPE_NO_BLEND) |
+                        (win.mAttrs.memoryType == MEMORY_TYPE_NO_BLEND)) {
+                        /* attibute changed from/to MEMORY_TYPE_NO_BLEND */
+                        if (win.mSurface != null) {
+                            if (SHOW_TRANSACTIONS) Slog.i(TAG, ">>> OPEN TRANSACTION");
+                            Surface.openTransaction();
+                            try {
+                                if (attrs.memoryType == MEMORY_TYPE_NO_BLEND) {
+                                    win.mSurface.setFlags(Surface.NO_BLEND, Surface.NO_BLEND);
+                                }
+                                else {
+                                    win.mSurface.setFlags(0, Surface.NO_BLEND);
+                                }
+                            } finally {
+                                if (SHOW_TRANSACTIONS) Slog.i(TAG, "<<< CLOSE TRANSACTION");
+                                Surface.closeTransaction();
+                            }
+                        }
+                    }
+                }
+#endif
             }
 
             if (DEBUG_LAYOUT) Slog.v(TAG, "Relayout " + win + ": " + win.mAttrs);
@@ -4601,6 +4697,10 @@ public class WindowManagerService extends IWindowManager.Stub
                     Surface.setOrientation(0, rotation, animFlags);
                 }
             }
+#ifdef CUSTOM_PANEL_SIRIUS
+            /*if (mMouseCursorType == CURSOR_OSD2)*/
+				OSD2Cursor.setRotation((short)rotation);
+#endif
             for (int i=mWindows.size()-1; i>=0; i--) {
                 WindowState w = mWindows.get(i);
                 if (w.mSurface != null) {
@@ -5041,6 +5141,9 @@ public class WindowManagerService extends IWindowManager.Stub
      * that to config-changed listeners if appropriate.
      */
     void sendNewConfiguration() {
+#ifdef CUSTOM_PANEL_SIRIUS
+        setMouseCursorVisibility(false);
+#endif
         try {
             mActivityManager.updateConfiguration(null);
         } catch (RemoteException e) {
@@ -5450,6 +5553,12 @@ public class WindowManagerService extends IWindowManager.Stub
         private void updateInputDispatchModeLw() {
             mInputManager.setInputDispatchMode(mInputDispatchEnabled, mInputDispatchFrozen);
         }
+
+#ifdef CUSTOM_PANEL_SIRIUS
+        public void handleCursorMotion(int x, int y) {
+            moveMouseCursor(x, y);
+        }
+#endif
     }
 
     public void pauseKeyDispatching(IBinder _token) {
@@ -5488,6 +5597,49 @@ public class WindowManagerService extends IWindowManager.Stub
 
         synchronized (mWindowMap) {
             mInputMonitor.setEventDispatchingLw(enabled);
+#ifdef CUSTOM_PANEL_SIRIUS
+        }
+    }
+
+    public void moveMouseCursor(int x, int y) {
+        synchronized (mMouseCursorLock) {
+            if (mMlx != x || mMly != y) {
+                mMlx = x;
+                mMly = y;
+
+                if (mMouseCursorType == MOUSE_CURSOR_SURFACE) {
+                    if (mMouseSurface != null)
+                        requestAnimationLocked(0);
+                } else if (mMouseCursorType == MOUSE_CURSOR_OSD2) {
+                    OSD2Cursor.setPosition((short)x, (short)y);
+                    if (!mMouseCursorShown) {
+                        OSD2Cursor.show();
+                    }
+                }
+                if (!mMouseCursorShown)
+                    mMouseCursorShown = true;
+
+                if(mAutoHideCursor){
+                    mH.removeCallbacks(mCursorRunable);
+                    mH.postDelayed(mCursorRunable, mAutoHideCursorTimeout);
+                }
+            }
+        }
+    }
+
+    private void setMouseCursorVisibility(boolean show) {
+        synchronized (mMouseCursorLock) {
+            if (mMouseCursorType == MOUSE_CURSOR_SURFACE) {
+                mMouseCursorShown = show;
+                requestAnimationLocked(0);
+            } else if (mMouseCursorType == MOUSE_CURSOR_OSD2) {
+                if (show)
+                    OSD2Cursor.show();
+                else
+                    OSD2Cursor.hide();
+                mMouseCursorShown = show;
+            }
+#endif
         }
     }
 
@@ -6370,6 +6522,12 @@ public class WindowManagerService extends IWindowManager.Stub
                 if (mAttrs.memoryType == MEMORY_TYPE_PUSH_BUFFERS) {
                     flags |= Surface.PUSH_BUFFERS;
                 }
+
+#ifdef CUSTOM_PANEL_SIRIUS
+                if (mAttrs.memoryType == MEMORY_TYPE_NO_BLEND) {
+                    flags |= Surface.NO_BLEND;
+                }
+#endif
 
                 if ((mAttrs.flags&WindowManager.LayoutParams.FLAG_SECURE) != 0) {
                     flags |= Surface.SECURE;
@@ -7862,6 +8020,29 @@ public class WindowManagerService extends IWindowManager.Stub
             labelRes = _labelRes;
             icon = _icon;
         }
+#ifdef CUSTOM_PANEL_SIRIUS
+    }
+
+	private final class CursorRunable implements Runnable{
+		public void run() {
+            synchronized (mMouseCursorLock) {
+                if (mMouseCursorType == MOUSE_CURSOR_OSD2) {
+                    OSD2Cursor.hide();
+                    mMouseCursorShown = false;
+                }
+                else if (mMouseCursorType == MOUSE_CURSOR_SURFACE) {
+                    synchronized (mWindowMap) {
+                        if (mMouseSurface != null) {
+                            mMouseSurface.openTransaction();
+                            mMouseSurface.hide();
+                            mMouseSurface.closeTransaction();
+			    mMouseCursorShown = false;
+                        }
+		    }
+                }
+	    }
+	}
+#endif
     }
 
     private final class H extends Handler {
@@ -8258,6 +8439,37 @@ public class WindowManagerService extends IWindowManager.Stub
         return false;
     }
 
+#ifdef CUSTOM_PANEL_SIRIUS
+    public int getMouseCursorType() {
+        synchronized (mMouseCursorLock) {
+            return mMouseCursorType;
+        }
+    }
+
+    public int setMouseCursorType(int type) {
+        synchronized (mMouseCursorLock) {
+            if (mMouseCursorShown) {
+                // hide old cursor
+                if (mMouseCursorType == MOUSE_CURSOR_OSD2) {
+                     OSD2Cursor.hide();
+                } else if (mMouseCursorType  == MOUSE_CURSOR_SURFACE) {
+                    synchronized (mWindowMap) {
+                        if (mMouseSurface != null) {
+                            mMouseSurface.openTransaction();
+                            mMouseSurface.hide();
+                            mMouseSurface.closeTransaction();
+                        }
+                    }
+                }
+            }
+            // let new cursor be redrawn in InputDispatcher
+            mMouseCursorShown = false;
+            mMouseCursorType = type;
+            return type;
+        }
+    }
+#endif
+
     // -------------------------------------------------------------
     // Internals
     // -------------------------------------------------------------
@@ -8598,6 +8810,66 @@ public class WindowManagerService extends IWindowManager.Stub
             mFxSession = new SurfaceSession();
             createWatermark = true;
         }
+
+#ifdef CUSTOM_PANEL_SIRIUS
+	synchronized(mMouseCursorLock){
+            if (mMouseCursorType == MOUSE_CURSOR_SURFACE) {
+                if(mMouseSurface == null){
+                    int x, y, w, h;
+                    Canvas canvas;
+                    Path path = new Path();
+                    w = 12;
+                    h = 20;
+                    x = (mDisplay.getWidth() - w) / 2;
+                    y = (mDisplay.getHeight() - h) / 2;
+                    try {
+                        /*
+                         *First Mouse event, create Surface
+                         */
+                         mMouseSurface =
+                             new Surface(mFxSession,
+                                     0, -1, w, h,
+                                     PixelFormat.TRANSPARENT,
+                                     Surface.FX_SURFACE_NORMAL);
+                        canvas = mMouseSurface.lockCanvas(null);
+                        Paint tPaint = new Paint();
+                        tPaint.setStyle(Paint.Style.STROKE);
+                        tPaint.setStrokeWidth(2);
+                        tPaint.setColor(0xffffffff);
+                        path.moveTo(0.0f, 0.0f);
+                        path.lineTo(12.0f, 12.0f);
+                        path.lineTo(7.0f, 12.0f);
+                        path.lineTo(11.0f, 20.0f);
+                        path.lineTo(8.0f, 21.0f);
+                        path.lineTo(4.0f, 13.0f);
+                        path.lineTo(0.0f, 17.0f);
+                        path.close();
+                        canvas.clipPath(path);
+                        canvas.drawColor(0xff000000);
+                        canvas.drawPath(path, tPaint);
+
+                        mMouseSurface.unlockCanvasAndPost(canvas);
+
+                        synchronized(mWindowMap){
+                            mMouseSurface.openTransaction();
+                            mMouseSurface.setSize(w, h);
+                            mMouseSurface.closeTransaction();
+                        }
+                    } catch (Exception e) {
+                        Slog.e(TAG, "Exception creating mouse surface",e);
+                    }
+                    mMlx = x;
+                    mMly = y;
+                    //mMlw = w;
+                    //mMlh = h;
+                }
+            } else if (mMouseCursorType == MOUSE_CURSOR_OSD2) {
+                OSD2Cursor.setDisplaySize((short)dw, (short)dh);
+                mMlx = dw / 2;
+                mMly = dh / 2;
+            }
+	}
+#endif
 
         if (SHOW_TRANSACTIONS) Slog.i(TAG, ">>> OPEN TRANSACTION");
 
@@ -9646,6 +9918,31 @@ public class WindowManagerService extends IWindowManager.Stub
                     mPointerSurface.hide();
                 }
             }
+#ifdef CUSTOM_PANEL_SIRIUS
+	    synchronized (mMouseCursorLock) {
+                // FOURTH LOOP: Display mouse cursor Surface
+                if (mMouseCursorType == MOUSE_CURSOR_SURFACE) {
+                    synchronized (mWindowMap) {
+                        if (mMouseCursorShown) {
+                            WindowState top = (WindowState)mWindows.get(mWindows.size() - 1);
+                            try {
+                                if (DEBUG_INPUT)
+                                    Slog.i(TAG, "Move surf, x: " +
+                                           Integer.toString(mMlx) + " y:"
+                                           + Integer.toString(mMly));
+                                mMouseSurface.show();
+                                mMouseSurface.setPosition(mMlx, mMly);
+                                mMouseSurface.setLayer(top.mAnimLayer + 1);
+                            } catch (RuntimeException e) {
+                                Slog.e(TAG, "Failure showing mouse surface", e);
+                            }
+                        } else {
+                            mMouseSurface.hide();
+                        }
+		    }
+                }
+	    }
+#endif
 
             if (SHOW_TRANSACTIONS) Slog.i(TAG, "<<< CLOSE TRANSACTION");
         } catch (RuntimeException e) {

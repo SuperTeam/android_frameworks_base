@@ -211,7 +211,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
 
     /** If true, hitting shift & menu will broadcast Intent.ACTION_BUG_REPORT */
     boolean mEnableShiftMenuBugReports = false;
-
+    
+    boolean mInitReady = false;
     boolean mSafeMode;
     WindowState mStatusBar = null;
     final ArrayList<WindowState> mStatusBarPanels = new ArrayList<WindowState>();
@@ -226,6 +227,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     boolean mLidOpen;
     int mUiMode = Configuration.UI_MODE_TYPE_NORMAL;
     int mDockMode = Intent.EXTRA_DOCK_STATE_UNDOCKED;
+    int mTvOutMode = Intent.EXTRA_TVOUT_STATE_OFF;
     int mLidOpenRotation;
     int mCarDockRotation;
     int mDeskDockRotation;
@@ -234,8 +236,11 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     int mUserRotation = Surface.ROTATION_0;
 
     boolean mAllowAllRotations;
+    int mTvOutRotation;
     boolean mCarDockEnablesAccelerometer;
     boolean mDeskDockEnablesAccelerometer;
+    boolean mTvOutEnablesAccelerometer;
+    boolean mLandscapeAutoSelectClockwise = true;
     int mLidKeyboardAccessibility;
     int mLidNavigationAccessibility;
     boolean mScreenOn = false;
@@ -417,7 +422,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         }
         // We're in a dock that has a rotation affinity, and the app is willing to rotate.
         if ((mCarDockEnablesAccelerometer && mDockMode == Intent.EXTRA_DOCK_STATE_CAR)
-                || (mDeskDockEnablesAccelerometer && mDockMode == Intent.EXTRA_DOCK_STATE_DESK)) {
+                || (mDeskDockEnablesAccelerometer && mDockMode == Intent.EXTRA_DOCK_STATE_DESK)
+                || (mTvOutEnablesAccelerometer && mTvOutMode == Intent.EXTRA_TVOUT_STATE_ON)) {
             // Note we override the nosensor flag here.
             if (appOrientation == ActivityInfo.SCREEN_ORIENTATION_USER
                     || appOrientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
@@ -444,7 +450,8 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             return true;
         }
         if ((mCarDockEnablesAccelerometer && mDockMode == Intent.EXTRA_DOCK_STATE_CAR) ||
-                (mDeskDockEnablesAccelerometer && mDockMode == Intent.EXTRA_DOCK_STATE_DESK)) {
+            (mDeskDockEnablesAccelerometer && mDockMode == Intent.EXTRA_DOCK_STATE_DESK) ||
+            (mTvOutEnablesAccelerometer && mTvOutMode == Intent.EXTRA_TVOUT_STATE_ON)) {
             // enable accelerometer if we are docked in a dock that enables accelerometer
             // orientation management,
             return true;
@@ -762,11 +769,14 @@ public class PhoneWindowManager implements WindowManagerPolicy {
         filter.addAction(UiModeManager.ACTION_ENTER_DESK_MODE);
         filter.addAction(UiModeManager.ACTION_EXIT_DESK_MODE);
         filter.addAction(Intent.ACTION_DOCK_EVENT);
+        filter.addAction(Intent.ACTION_TVOUT_EVENT);
         Intent intent = context.registerReceiver(mDockReceiver, filter);
         if (intent != null) {
             // Retrieve current sticky dock event broadcast.
             mDockMode = intent.getIntExtra(Intent.EXTRA_DOCK_STATE,
                     Intent.EXTRA_DOCK_STATE_UNDOCKED);
+            mTvOutMode = intent.getIntExtra(Intent.EXTRA_TVOUT_STATE,
+                    Intent.EXTRA_TVOUT_STATE_OFF);
         }
         mVibrator = new Vibrator();
         mLongPressVibePattern = loadHaptic(HapticFeedbackConstants.LONG_PRESS);
@@ -1289,6 +1299,7 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             Log.d(TAG, "interceptKeyTi keyCode=" + keyCode + " down=" + down + " repeatCount="
                     + repeatCount + " keyguardOn=" + keyguardOn + " mHomePressed=" + mHomePressed);
         }
+
 
         // Clear a pending HOME longpress if the user releases Home
         // TODO: This could probably be inside the next bit of logic, but that code
@@ -2348,7 +2359,10 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             if (Intent.ACTION_DOCK_EVENT.equals(intent.getAction())) {
                 mDockMode = intent.getIntExtra(Intent.EXTRA_DOCK_STATE,
                         Intent.EXTRA_DOCK_STATE_UNDOCKED);
-            } else {
+            }else if (Intent.ACTION_TVOUT_EVENT.equals(intent.getAction())) {
+                mTvOutMode = intent.getIntExtra(Intent.EXTRA_TVOUT_STATE,
+                        Intent.EXTRA_TVOUT_STATE_OFF);
+            }else {
                 try {
                     IUiModeManager uiModeService = IUiModeManager.Stub.asInterface(
                             ServiceManager.getService(Context.UI_MODE_SERVICE));
@@ -2481,7 +2495,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
             // case for nosensor meaning ignore sensor and consider only lid
             // or orientation sensor disabled
             //or case.unspecified
-            if (mLidOpen) {
+            if (mTvOutMode == Intent.EXTRA_TVOUT_STATE_ON && mTvOutRotation >= 0) {
+                return mTvOutRotation;
+            }else if (mLidOpen) {
                 return mLidOpenRotation;
             } else if (mDockMode == Intent.EXTRA_DOCK_STATE_CAR && mCarDockRotation >= 0) {
                 return mCarDockRotation;
@@ -2627,7 +2643,9 @@ public class PhoneWindowManager implements WindowManagerPolicy {
     void updateRotation(int animFlags) {
         mPowerManager.setKeyboardVisibility(mLidOpen);
         int rotation = Surface.ROTATION_0;
-        if (mLidOpen) {
+        if (mTvOutMode == Intent.EXTRA_TVOUT_STATE_ON && mTvOutRotation >= 0) {
+            rotation = mTvOutRotation;
+        }else if (mLidOpen) {
             rotation = mLidOpenRotation;
         } else if (mDockMode == Intent.EXTRA_DOCK_STATE_CAR && mCarDockRotation >= 0) {
             rotation = mCarDockRotation;

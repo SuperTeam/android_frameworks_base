@@ -4,6 +4,10 @@ LOCAL_PATH:= $(call my-dir)
 # ============================================================
 include $(CLEAR_VARS)
 
+ifeq ($(BOARD_HAVE_CUSTOM_PANEL_SIRIUS),true)
+LOCAL_CFLAGS += -DCUSTOM_PANEL_SIRIUS
+endif
+
 LOCAL_SRC_FILES := \
             $(call all-subdir-java-files) \
 	    com/android/server/EventLogTags.logtags \

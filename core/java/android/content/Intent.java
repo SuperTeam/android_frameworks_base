@@ -1879,6 +1879,20 @@ public class Intent implements Parcelable, Cloneable {
             "android.intent.action.DOCK_EVENT";
 
     /**
+     * Broadcast Action:  A sticky broadcast for changes in the tv out state of the device.
+     *
+     * <p>The intent will have the following extra values:
+     * <ul>
+     *   <li><em>{@link #EXTRA_TVOUT_STATE}</em> - the current tv out
+     *       state, indicating if tv out or not.</li>
+     * </ul>
+     * <p>This is intended for monitoring the current tv out state.
+     */
+    @SdkConstant(SdkConstantType.BROADCAST_INTENT_ACTION)
+    public static final String ACTION_TVOUT_EVENT =
+            "android.intent.action.TVOUT_EVENT";
+
+    /**
      * Broadcast Action: a remote intent is to be broadcasted.
      *
      * A remote intent is used for remote RPC between devices. The remote intent
@@ -2249,6 +2263,26 @@ public class Intent implements Parcelable, Cloneable {
      * indicate that the dock should take over the home key when it is active.
      */
     public static final String METADATA_DOCK_HOME = "android.dock_home";
+
+   /**
+     * Used as an int extra field in {@link android.content.Intent#ACTION_TVOUT_EVENT}
+     * intents to request the tv out state.  Possible values are
+     * {@link android.content.Intent#EXTRA_TVOUT_STATE_ON},
+     * {@link android.content.Intent#EXTRA_TVOUT_STATE_OFF}, or
+     */
+    public static final String EXTRA_TVOUT_STATE = "android.intent.extra.TVOUT_STATE";
+
+    /**
+     * Used as an int value for {@link android.content.Intent#EXTRA_TVOUT_STATE}
+     * to represent that the mid tv out cable plug out.
+     */
+    public static final int EXTRA_TVOUT_STATE_OFF = 0;
+
+   /**
+     * Used as an int value for {@link android.content.Intent#EXTRA_TVOUT_STATE}
+     * to represent that the mid tv out cable plug in.
+     */
+    public static final int EXTRA_TVOUT_STATE_ON = 1;
 
     /**
      * Used as a parcelable extra field in {@link #ACTION_APP_ERROR}, containing
