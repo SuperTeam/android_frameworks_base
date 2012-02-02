@@ -54,6 +54,7 @@ import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.os.SystemProperties;
 import android.os.WorkSource;
+import android.os.SystemProperties;
 import android.provider.Settings.SettingNotFoundException;
 import android.provider.Settings;
 import android.util.EventLog;
@@ -307,6 +308,36 @@ class PowerManagerService extends IPowerManager.Stub
     private native void nativeInit();
     private native void nativeSetPowerState(boolean screenOn, boolean screenBright);
     private native void nativeStartSurfaceFlingerAnimation(int mode);
+
+    /*
+    static PrintStream mLog;
+    static {
+        try {
+            mLog = new PrintStream("/data/power.log");
+        }
+        catch (FileNotFoundException e) {
+            android.util.Slog.e(TAG, "Life is hard", e);
+        }
+    }
+    static class Log {
+        static void d(String tag, String s) {
+            mLog.println(s);
+            android.util.Slog.d(tag, s);
+        }
+        static void i(String tag, String s) {
+            mLog.println(s);
+            android.util.Slog.i(tag, s);
+        }
+        static void w(String tag, String s) {
+            mLog.println(s);
+            android.util.Slog.w(tag, s);
+        }
+        static void e(String tag, String s) {
+            mLog.println(s);
+            android.util.Slog.e(tag, s);
+        }
+    }
+    */
 
     /**
      * This class works around a deadlock between the lock in PowerManager.WakeLock
