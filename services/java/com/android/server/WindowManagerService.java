@@ -205,6 +205,13 @@ public class WindowManagerService extends IWindowManager.Stub
     /** Adjustment to time to perform a dim, to make it more dramatic.
      */
     static final int DIM_DURATION_MULTIPLIER = 6;
+
+    /**
+     * If true, the window manager will do its own custom freezing and general
+     * management of the screen during rotation.
+     * @hide
+     */
+    static final boolean CUSTOM_SCREEN_ROTATION = SystemProperties.getBoolean("persist.sys.rotationanimation",true);
     
     // Maximum number of milliseconds to wait for input event injection.
     // FIXME is this value reasonable?
@@ -10039,6 +10046,13 @@ public class WindowManagerService extends IWindowManager.Stub
         if (mDisplayFrozen) {
             return;
         }
+
+        /* We might have a null mFxSession here if the user has
+           the lock-screen disabled.*/
+        if (mFxSession == null) {
+            mFxSession = new SurfaceSession();
+        }
+
 
         mScreenFrozenLock.acquire();
 
