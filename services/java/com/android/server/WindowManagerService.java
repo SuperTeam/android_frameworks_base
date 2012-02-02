@@ -217,7 +217,7 @@ public class WindowManagerService extends IWindowManager.Stub
      * management of the screen during rotation.
      * @hide
      */
-    static final boolean CUSTOM_SCREEN_ROTATION = true;
+    static final boolean CUSTOM_SCREEN_ROTATION = SystemProperties.getBoolean("persist.sys.rotationanimation",true);
     
     // Maximum number of milliseconds to wait for input event injection.
     // FIXME is this value reasonable?
@@ -10375,6 +10375,13 @@ public class WindowManagerService extends IWindowManager.Stub
         if (mDisplayFrozen) {
             return;
         }
+
+        /* We might have a null mFxSession here if the user has
+           the lock-screen disabled.*/
+        if (mFxSession == null) {
+            mFxSession = new SurfaceSession();
+        }
+
 
         mScreenFrozenLock.acquire();
 

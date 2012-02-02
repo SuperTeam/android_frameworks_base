@@ -568,7 +568,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
 
         //Ring setup
         int ringlockStyle = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.RINGLOCK_STYLE_PREF, RinglockStyle.getIdByStyle(RinglockStyle.Bubble));
+                Settings.System.RINGLOCK_STYLE_PREF, RinglockStyle.getIdByStyle(RinglockStyle.Blade));
         int resSecNorm, resRingGreen, resRingHighlight;
         int resUnlock, resCustom, resTarget;
 
@@ -588,6 +588,14 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
                 resUnlock = R.drawable.ic_jog_dial_holo_unlock;
                 resCustom = R.drawable.ic_jog_dial_holo_custom;
                 resTarget = R.drawable.jog_tab_target_holo;
+                break;
+            case Blade:
+                resSecNorm = R.drawable.jog_ring_blade_secback_normal;
+                resRingGreen = R.drawable.jog_ring_blade_ring_green;
+                resRingHighlight = R.drawable.jog_ring_blade_ring_pressed_red;
+                resUnlock = R.drawable.ic_jog_dial_unlock;
+                resCustom = R.drawable.ic_jog_dial_custom;
+                resTarget = R.drawable.jog_tab_target_green;
                 break;
             default:
                 resSecNorm = R.drawable.jog_ring_secback_normal;
@@ -852,7 +860,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
 
         //Ringlock resource setup
         int ringlockStyle = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.RINGLOCK_STYLE_PREF, RinglockStyle.getIdByStyle(RinglockStyle.Bubble));
+                Settings.System.RINGLOCK_STYLE_PREF, RinglockStyle.getIdByStyle(RinglockStyle.Blade));
 
         int ringResource;
 
@@ -871,6 +879,10 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
                 } else {
                     iconId = R.drawable.ic_jog_dial_holo_sound_on;
                 }
+                break;
+            case Blade:
+                ringResource = mSilentMode ? R.drawable.jog_ring_blade_ring_yellow :
+                                             R.drawable.jog_ring_blade_ring_gray;
                 break;
             default:
                 ringResource = mSilentMode ? R.drawable.jog_ring_ring_yellow :
