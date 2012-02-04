@@ -1,3 +1,4 @@
+ifneq ($(FRAMEWORK_SKIP_TESTS), true)
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -12,3 +13,4 @@ LOCAL_JAVA_LIBRARIES := android.test.runner
 LOCAL_PACKAGE_NAME := FrameworksTelephonyTests
 
 include $(BUILD_PACKAGE)
+endif
