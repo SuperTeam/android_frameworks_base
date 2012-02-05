@@ -1,4 +1,5 @@
 # Build the unit tests.
+ifneq ($(FRAMEWORK_SKIP_TESTS), true)
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -42,4 +43,5 @@ $(foreach file,$(test_src_files), \
     $(eval include $(BUILD_EXECUTABLE)) \
 )
 
+endif
 endif
