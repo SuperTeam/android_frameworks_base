@@ -568,7 +568,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
 
         //Ring setup
         int ringlockStyle = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.RINGLOCK_STYLE_PREF, RinglockStyle.getIdByStyle(RinglockStyle.Blade));
+                Settings.System.RINGLOCK_STYLE_PREF, RinglockStyle.getIdByStyle(RinglockStyle.Bubble));
         int resSecNorm, resRingGreen, resRingHighlight;
         int resUnlock, resCustom, resTarget;
 
@@ -860,7 +860,7 @@ class LockScreen extends LinearLayout implements KeyguardScreen, KeyguardUpdateM
 
         //Ringlock resource setup
         int ringlockStyle = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.RINGLOCK_STYLE_PREF, RinglockStyle.getIdByStyle(RinglockStyle.Blade));
+                Settings.System.RINGLOCK_STYLE_PREF, RinglockStyle.getIdByStyle(RinglockStyle.Bubble));
 
         int ringResource;
 

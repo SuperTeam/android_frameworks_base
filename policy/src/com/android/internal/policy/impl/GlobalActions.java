@@ -200,7 +200,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             void willCreate() {
                 // XXX: FIXME: switch to ic_lock_vibrate_mode when available
                 mEnabledIconResId = (Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.VIBRATE_IN_SILENT, 1) == 1)
+                        Settings.System.VIBRATE_IN_SILENT, 0) == 1)
                     ? R.drawable.ic_lock_silent_mode_vibrate
                     : R.drawable.ic_lock_silent_mode;
             }
@@ -208,7 +208,7 @@ class GlobalActions implements DialogInterface.OnDismissListener, DialogInterfac
             void onToggle(boolean on) {
                 if (on) {
                     mAudioManager.setRingerMode((Settings.System.getInt(mContext.getContentResolver(),
-                        Settings.System.VIBRATE_IN_SILENT, 1) == 1)
+                        Settings.System.VIBRATE_IN_SILENT, 0) == 1)
                         ? AudioManager.RINGER_MODE_VIBRATE
                         : AudioManager.RINGER_MODE_SILENT);
                 } else {
